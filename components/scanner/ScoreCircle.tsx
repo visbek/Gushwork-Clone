@@ -61,7 +61,7 @@ export function ScoreCircle({
         viewBox="0 0 160 160"
         style={{ position: "absolute", top: 0, left: 0 }}
       >
-        <circle cx="80" cy="80" r="52" fill="none" stroke="#1c1c1c" strokeWidth="8" />
+        <circle cx="80" cy="80" r="52" fill="none" stroke="var(--sp-border-card)" strokeWidth="8" />
         <circle
           cx="80"
           cy="80"

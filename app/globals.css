@@ -81,6 +81,28 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* ── sparrwo theme — dark (default) ───────────────────── */
+  --sp-bg: #0d0d0d;
+  --sp-bg-section: #0a0a0a;
+  --sp-card: #141414;
+  --sp-card-inner: #0d0d0d;
+  --sp-border: #1a1a1a;
+  --sp-border-card: #222222;
+  --sp-text: #f5f5f5;
+  --sp-text-2: #aaaaaa;
+  --sp-text-3: #777777;
+  --sp-text-4: #555555;
+  --sp-accent: #6C63FF;
+  --sp-accent-bg: rgba(108, 99, 255, 0.08);
+  --sp-accent-border: rgba(108, 99, 255, 0.25);
+  --sp-nav-bg: rgba(13, 13, 13, 0.9);
+  --sp-nav-border: #1a1a1a;
+  --sp-input-bg: rgba(255, 255, 255, 0.025);
+  --sp-input-border: rgba(255, 255, 255, 0.08);
+  --sp-row-even: #0d0d0d;
+  --sp-row-odd: #111111;
+  --sp-row-hover: #161616;
 }
 
 .dark {
@@ -117,6 +139,30 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ── sparrwo light mode ────────────────────────────────── */
+html.light {
+  --sp-bg: #ffffff;
+  --sp-bg-section: #f8f8f8;
+  --sp-card: #f3f3f3;
+  --sp-card-inner: #eaeaea;
+  --sp-border: rgba(0, 0, 0, 0.07);
+  --sp-border-card: rgba(0, 0, 0, 0.09);
+  --sp-text: #1a1a1a;
+  --sp-text-2: #444444;
+  --sp-text-3: #777777;
+  --sp-text-4: #aaaaaa;
+  --sp-accent: #6C63FF;
+  --sp-accent-bg: rgba(108, 99, 255, 0.07);
+  --sp-accent-border: rgba(108, 99, 255, 0.2);
+  --sp-nav-bg: rgba(255, 255, 255, 0.92);
+  --sp-nav-border: rgba(0, 0, 0, 0.07);
+  --sp-input-bg: rgba(0, 0, 0, 0.02);
+  --sp-input-border: rgba(0, 0, 0, 0.1);
+  --sp-row-even: #f8f8f8;
+  --sp-row-odd: #f3f3f3;
+  --sp-row-hover: #eeeeee;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -134,7 +180,10 @@ html {
   scroll-behavior: smooth;
 }
 body {
-  background: #0a0a0a;
+  background: var(--sp-bg);
+  color: var(--sp-text);
+  font-family: var(--font-dm-sans, var(--font-inter, system-ui));
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ── Custom animations ─────────────────────────────── */
@@ -154,11 +203,16 @@ body {
   from { opacity: 0; transform: translateY(22px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@keyframes sp-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.78); }
+}
 
 .animate-orb-1 { animation: orb-pulse 9s ease-in-out infinite; }
 .animate-orb-2 { animation: orb-pulse-2 13s ease-in-out infinite; }
 .animate-blink-dot { animation: blink-dot 1.6s ease-in-out infinite; }
 .animate-fade-in-up { animation: fade-in-up 0.55s ease-out both; }
+.animate-sp-pulse { animation: sp-pulse 1.4s ease-in-out infinite; }
 
 /* ── Grain texture ─────────────────────────────────── */
 .grain-overlay { position: relative; }
@@ -170,5 +224,5 @@ body {
   z-index: 1;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
   background-size: 200px 200px;
-  opacity: 0.028;
+  opacity: 0.018;
 }

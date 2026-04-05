@@ -10,11 +10,40 @@ import {
   type EngineState,
 } from "@/components/scanner/types";
 
+// ── Theme toggle icons ───────────────────────────────────────────────────────
+
+function SunIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  );
+}
+
 export default function Home() {
   const [domain, setDomain] = useState("");
   const [status, setStatus] = useState<ScanStatus>("idle");
   const [rateLimited, setRateLimited] = useState(false);
   const [scanData, setScanData] = useState<ScanData | null>(null);
+
+  // Theme
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   // Email wall state
   const [emailCaptured, setEmailCaptured] = useState(false);
@@ -33,6 +62,29 @@ export default function Home() {
   const [scanTextIdx, setScanTextIdx] = useState(0);
 
   const resultsRef = useRef<HTMLDivElement | null>(null);
+
+  // ── Theme init ───────────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    const saved = (localStorage.getItem("sparrwo_theme") ?? "dark") as "dark" | "light";
+    setTheme(saved);
+    if (saved === "light") {
+      document.documentElement.classList.add("light");
+    } else {
+      document.documentElement.classList.remove("light");
+    }
+  }, []);
+
+  function toggleTheme() {
+    const next: "dark" | "light" = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    localStorage.setItem("sparrwo_theme", next);
+    if (next === "light") {
+      document.documentElement.classList.add("light");
+    } else {
+      document.documentElement.classList.remove("light");
+    }
+  }
 
   // ── localStorage ────────────────────────────────────────────────────────────
 
@@ -162,31 +214,58 @@ export default function Home() {
 
   return (
     <main
-      className="min-h-screen text-white overflow-x-hidden"
+      className="min-h-screen overflow-x-hidden transition-colors duration-300"
       style={{
-        background: "#0a0a0a",
-        fontFamily: "var(--font-inter, var(--font-geist-sans))",
+        background: "var(--sp-bg)",
+        color: "var(--sp-text)",
+        fontFamily: "var(--font-dm-sans, system-ui)",
       }}
     >
       {/* Nav */}
       <nav
-        className="sticky top-0 z-40 border-b px-6 py-4 backdrop-blur-md"
-        style={{ borderColor: "#1a1a1a", background: "rgba(10,10,10,0.88)" }}
+        className="sticky top-0 z-40 border-b px-6 py-4 backdrop-blur-md transition-colors duration-300"
+        style={{
+          borderColor: "var(--sp-nav-border)",
+          background: "var(--sp-nav-bg)",
+        }}
       >
         <div className="mx-auto max-w-6xl flex items-center justify-between">
+          {/* Logo */}
           <span
-            className="text-lg font-bold tracking-tight"
-            style={{ fontFamily: "var(--font-geist-sans)" }}
+            className="text-lg font-bold tracking-tight lowercase"
+            style={{
+              fontFamily: "var(--font-dm-sans, system-ui)",
+              color: "var(--sp-text)",
+            }}
           >
-            Visibility<span style={{ color: "#00D4AA" }}>AI</span>
+            sparrwo
           </span>
-          <span className="text-sm hidden sm:block" style={{ color: "#555" }}>
-            Free scan · No account needed
-          </span>
+
+          {/* Right side */}
+          <div className="flex items-center gap-3">
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              className="w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:bg-black/5"
+              style={{ color: "var(--sp-text-3)" }}
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            </button>
+
+            {/* Try Free */}
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="hidden sm:block rounded-full px-4 py-1.5 text-xs font-bold transition-all hover:opacity-90 active:scale-[0.97]"
+              style={{ background: "var(--sp-accent)", color: "#fff" }}
+            >
+              Try Free
+            </button>
+          </div>
         </div>
       </nav>
 
-      {/* Hero + marketing (collapses when results load) */}
+      {/* Hero + marketing */}
       <HeroSection
         domain={domain}
         status={status}
@@ -199,19 +278,19 @@ export default function Home() {
         <div className="px-6 py-6 flex justify-center">
           <div
             className="rounded-2xl border px-6 py-5 max-w-lg w-full text-center"
-            style={{ background: "#111", borderColor: "#00D4AA30" }}
+            style={{
+              background: "var(--sp-card)",
+              borderColor: "var(--sp-accent-border)",
+            }}
           >
-            <p className="text-sm mb-4" style={{ color: "#aaa" }}>
+            <p className="text-sm mb-4" style={{ color: "var(--sp-text-2)" }}>
               You&apos;ve used your 3 free scans today.{" "}
-              <span style={{ color: "#fff" }}>Upgrade for unlimited scans.</span>
+              <span style={{ color: "var(--sp-text)" }}>Upgrade for unlimited scans.</span>
             </p>
             <a
               href="/pricing"
-              className="inline-block rounded-xl px-6 py-2.5 text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{
-                background: "linear-gradient(135deg, #00D4AA 0%, #6366f1 100%)",
-                color: "#0a0a0a",
-              }}
+              className="inline-block rounded-full px-6 py-2.5 text-sm font-bold transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
+              style={{ background: "var(--sp-accent)", color: "#fff" }}
             >
               Upgrade for unlimited scans →
             </a>
@@ -246,12 +325,20 @@ export default function Home() {
 
       {/* Footer */}
       <footer
-        className="border-t px-6 py-8 text-center text-sm"
-        style={{ borderColor: "#1a1a1a", color: "#444" }}
+        className="border-t px-6 py-8 text-center text-sm transition-colors duration-300"
+        style={{ borderColor: "var(--sp-border)", color: "var(--sp-text-4)" }}
       >
         <span suppressHydrationWarning>
-          © {new Date().getFullYear()} VisibilityAI. Built for growth-stage B2B SaaS teams.
+          sparrwo © {new Date().getFullYear()}
         </span>
+        <span className="mx-3" style={{ color: "var(--sp-border-card)" }}>·</span>
+        <a href="/privacy" className="hover:underline transition-colors" style={{ color: "var(--sp-text-3)" }}>
+          Privacy
+        </a>
+        <span className="mx-3" style={{ color: "var(--sp-border-card)" }}>·</span>
+        <a href="/terms" className="hover:underline transition-colors" style={{ color: "var(--sp-text-3)" }}>
+          Terms
+        </a>
       </footer>
     </main>
   );
