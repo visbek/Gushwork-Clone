@@ -182,6 +182,14 @@ interface ResultsSectionProps {
   sectionRef: React.RefObject<HTMLDivElement | null>;
 }
 
+function isValidEmail(email: string): boolean {
+  const atIdx = email.indexOf("@");
+  if (email.length < 5) return false;
+  if (atIdx < 1) return false;
+  const afterAt = email.slice(atIdx + 1);
+  return afterAt.includes(".");
+}
+
 export function ResultsSection({
   scanData,
   emailCaptured,
@@ -195,6 +203,7 @@ export function ResultsSection({
   sectionRef,
 }: ResultsSectionProps) {
   const scoreActive = true;
+  const [emailError, setEmailError] = useState("");
 
   const insights = scanData.categoryScores
     ? (() => {
@@ -531,7 +540,15 @@ export function ResultsSection({
                                 </p>
 
                                 <form
-                                  onSubmit={onEmailSubmit}
+                                  onSubmit={(e) => {
+                                    e.preventDefault();
+                                    if (!isValidEmail(emailInput.trim())) {
+                                      setEmailError("Please enter a valid email address");
+                                      return;
+                                    }
+                                    setEmailError("");
+                                    onEmailSubmit(e);
+                                  }}
                                   className="mx-auto space-y-3"
                                   style={{ maxWidth: 360 }}
                                 >
@@ -541,7 +558,10 @@ export function ResultsSection({
                                       type="email"
                                       required
                                       value={emailInput}
-                                      onChange={(e) => onEmailChange(e.target.value)}
+                                      onChange={(e) => {
+                                        onEmailChange(e.target.value);
+                                        if (emailError) setEmailError("");
+                                      }}
                                       onFocus={() => onEmailFocus(true)}
                                       onBlur={() => onEmailFocus(false)}
                                       placeholder=" "
@@ -574,6 +594,11 @@ export function ResultsSection({
                                       Work email
                                     </label>
                                   </div>
+                                  {emailError && (
+                                    <p className="text-xs text-red-400 text-left -mt-1">
+                                      {emailError}
+                                    </p>
+                                  )}
                                   <button
                                     type="submit"
                                     disabled={emailSubmitting}
