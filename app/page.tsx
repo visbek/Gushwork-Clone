@@ -218,7 +218,7 @@ export default function Home() {
       style={{
         background: "var(--sp-bg)",
         color: "var(--sp-text)",
-        fontFamily: "var(--font-dm-sans, system-ui)",
+        fontFamily: "var(--font-body, system-ui)",
       }}
     >
       {/* Nav */}
@@ -234,7 +234,7 @@ export default function Home() {
           <span
             className="text-lg font-bold tracking-tight lowercase"
             style={{
-              fontFamily: "var(--font-dm-sans, system-ui)",
+              fontFamily: "var(--font-body, system-ui)",
               color: "var(--sp-text)",
             }}
           >

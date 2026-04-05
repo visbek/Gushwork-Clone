@@ -46,14 +46,13 @@ export function HeroSection({
               AI Search Intelligence
             </p>
 
-            {/* Headline — Playfair Display italic */}
+            {/* Headline — Syne bold geometric */}
             <h1
               className="mb-6 font-bold text-[32px] sm:text-[48px] lg:text-[60px] animate-fade-in-up"
               style={{
                 lineHeight: 1.12,
                 letterSpacing: "-0.02em",
-                fontFamily: "var(--font-playfair)",
-                fontStyle: "italic",
+                fontFamily: "var(--font-heading)",
                 color: "var(--sp-text)",
                 animationDelay: "0.08s",
               }}
@@ -192,7 +191,7 @@ export function HeroSection({
             <h2
               className="mb-12 text-center text-2xl font-bold sm:text-3xl"
               style={{
-                fontFamily: "var(--font-playfair)",
+                fontFamily: "var(--font-heading)",
                 letterSpacing: "-0.02em",
                 color: "var(--sp-text)",
               }}
@@ -252,7 +251,7 @@ export function HeroSection({
               <h2
                 className="mb-4 text-2xl font-bold sm:text-3xl"
                 style={{
-                  fontFamily: "var(--font-playfair)",
+                  fontFamily: "var(--font-heading)",
                   letterSpacing: "-0.02em",
                   color: "var(--sp-text)",
                 }}
@@ -312,8 +311,7 @@ export function HeroSection({
               <h2
                 className="mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold"
                 style={{
-                  fontFamily: "var(--font-playfair)",
-                  fontStyle: "italic",
+                  fontFamily: "var(--font-heading)",
                   letterSpacing: "-0.025em",
                   color: "var(--sp-text)",
                 }}

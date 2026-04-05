@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, DM_Sans, Playfair_Display } from "next/font/google";
+import { Geist_Mono, Inter, Syne } from "next/font/google";
 import "./globals.css";
 
 const geistMono = Geist_Mono({
@@ -7,16 +7,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const inter = Inter({
+  variable: "--font-body",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const syne = Syne({
+  variable: "--font-heading",
   subsets: ["latin"],
-  style: ["normal", "italic"],
   weight: ["700", "800"],
 });
 
@@ -34,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistMono.variable} ${dmSans.variable} ${playfair.variable} h-full antialiased`}
+      className={`${geistMono.variable} ${inter.variable} ${syne.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

@@ -533,7 +533,7 @@ export function ResultsSection({
                                 <h3
                                   className="text-xl font-bold mb-2"
                                   style={{
-                                    fontFamily: "var(--font-playfair)",
+                                    fontFamily: "var(--font-heading)",
                                     color: "var(--sp-text)",
                                   }}
                                 >
@@ -688,7 +688,7 @@ export function ResultsSection({
           <h3
             className="mb-2 text-xl font-bold"
             style={{
-              fontFamily: "var(--font-playfair)",
+              fontFamily: "var(--font-heading)",
               color: "var(--sp-text)",
             }}
           >
