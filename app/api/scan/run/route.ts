@@ -23,6 +23,8 @@ function detectBrand(
   const text = responseText.toLowerCase();
   const checks = new Set<string>();
 
+  console.log(`  [DETECT] companyName="${companyName}" domain="${domain}" responseLength=${responseText.length}`);
+
   // Clean company name — remove common corporate suffixes
   const cleanName = companyName
     .toLowerCase()
@@ -35,8 +37,9 @@ function detectBrand(
 
   checks.add(cleanName);
 
-  // Each individual word from the cleaned name (min 3 chars)
-  cleanName.split(/\s+/).forEach((word) => {
+  // Split on ANY non-alphanumeric character (dots, hyphens, spaces, etc.)
+  // Fixes: "Lovable.dev" → ["lovable", "dev"], "my-app" → ["my", "app"]
+  cleanName.split(/[^a-z0-9]+/).forEach((word) => {
     if (word.length >= 3) checks.add(word);
   });
 
@@ -53,13 +56,13 @@ function detectBrand(
   const validChecks = [...checks].filter((c) => c.length >= 3);
 
   console.log(`  [DETECT] Checking for: ${JSON.stringify(validChecks)}`);
-  console.log(`  [DETECT] Text (first 200): "${text.slice(0, 200)}"`);
+  console.log(`  [DETECT] Text (first 500): "${text.slice(0, 500)}"`);
 
   const found = validChecks.find((check) => text.includes(check));
   if (found) {
     console.log(`  [DETECT] FOUND "${found}"`);
   } else {
-    console.log(`  [DETECT] NOT FOUND`);
+    console.log(`  [DETECT] NOT FOUND in ${responseText.length} chars`);
   }
 
   return !!found;
