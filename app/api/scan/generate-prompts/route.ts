@@ -279,7 +279,7 @@ Write all 24 prompts as long, conversational questions a real person would type 
     console.log("[generate-prompts] Calling Claude for ICP analysis + 24 prompts...");
 
     const message = await client.messages.create({
-      model: "claude-haiku-4-5",
+      model: "claude-sonnet-4-5",
       max_tokens: 3000,
       messages: [{ role: "user", content: claudePrompt }],
     });

@@ -13,7 +13,7 @@ export async function GET() {
     try {
       const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
       const message = await client.messages.create({
-        model: "claude-haiku-4-5",
+        model: "claude-sonnet-4-5",
         max_tokens: 64,
         messages: [{ role: "user", content: "say hello" }],
       });
