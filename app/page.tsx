@@ -13,6 +13,7 @@ import {
 export default function Home() {
   const [domain, setDomain] = useState("");
   const [status, setStatus] = useState<ScanStatus>("idle");
+  const [rateLimited, setRateLimited] = useState(false);
   const [scanData, setScanData] = useState<ScanData | null>(null);
 
   // Email wall state
@@ -91,6 +92,7 @@ export default function Home() {
     const trimmed = inputDomain.trim().replace(/^https?:\/\//, "").replace(/\/$/, "");
     if (!trimmed) return;
     setScanData(null);
+    setRateLimited(false);
     setStatus("generating");
     setScanTextIdx(0);
 
@@ -100,6 +102,11 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ domain: trimmed }),
       });
+      if (r1.status === 429) {
+        setRateLimited(true);
+        setStatus("error");
+        return;
+      }
       if (!r1.ok) throw new Error("Failed to generate prompts");
       const icpData = await r1.json();
       setStatus("scanning");
@@ -186,6 +193,31 @@ export default function Home() {
         onDomainChange={setDomain}
         onScan={handleScan}
       />
+
+      {/* Rate limit banner */}
+      {rateLimited && (
+        <div className="px-6 py-6 flex justify-center">
+          <div
+            className="rounded-2xl border px-6 py-5 max-w-lg w-full text-center"
+            style={{ background: "#111", borderColor: "#00D4AA30" }}
+          >
+            <p className="text-sm mb-4" style={{ color: "#aaa" }}>
+              You&apos;ve used your 3 free scans today.{" "}
+              <span style={{ color: "#fff" }}>Upgrade for unlimited scans.</span>
+            </p>
+            <a
+              href="/pricing"
+              className="inline-block rounded-xl px-6 py-2.5 text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
+              style={{
+                background: "linear-gradient(135deg, #00D4AA 0%, #6366f1 100%)",
+                color: "#0a0a0a",
+              }}
+            >
+              Upgrade for unlimited scans →
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Scanning animation */}
       {isLoading && (

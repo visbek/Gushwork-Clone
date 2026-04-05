@@ -38,25 +38,29 @@ function detectBrand(
   checks.add(cleanName);
 
   // Split on ANY non-alphanumeric character (dots, hyphens, spaces, etc.)
-  // Fixes: "Lovable.dev" → ["lovable", "dev"], "my-app" → ["my", "app"]
+  // "Lovable.dev" → ["lovable", "dev"], "my-app" → ["my", "app"]
   cleanName.split(/[^a-z0-9]+/).forEach((word) => {
-    if (word.length >= 3) checks.add(word);
+    if (word.length >= 4) checks.add(word);
   });
 
-  // Domain root without protocol/www/TLD
-  const domainRoot = normalizeDomain(domain).split(".")[0].toLowerCase();
+  // Domain root — split on dots AND hyphens for compound domains
+  const fullDomainNorm = normalizeDomain(domain);
+  const domainRoot = fullDomainNorm.split(".")[0].toLowerCase();
   checks.add(domainRoot);
+  domainRoot.split(/[^a-z0-9]+/).forEach((word) => {
+    if (word.length >= 4) checks.add(word);
+  });
 
-  // Variations — handle hyphens, spaces, camelCase
+  // Compact variations
   checks.add(domainRoot.replace(/-/g, ""));
   checks.add(cleanName.replace(/\s+/g, ""));
   checks.add(cleanName.replace(/\s+/g, "-"));
 
-  // Filter out anything too short to be meaningful
-  const validChecks = [...checks].filter((c) => c.length >= 3);
+  // Min 4 chars to avoid false positives on "the", "for", "app", etc.
+  const validChecks = [...checks].filter((c) => c.length >= 4);
 
   console.log(`  [DETECT] Checking for: ${JSON.stringify(validChecks)}`);
-  console.log(`  [DETECT] Text (first 500): "${text.slice(0, 500)}"`);
+  console.log(`  [DETECT] Full text (${text.length} chars): "${text.slice(0, 300)}"`);
 
   const found = validChecks.find((check) => text.includes(check));
   if (found) {
@@ -256,45 +260,45 @@ export async function POST(request: NextRequest) {
     );
     console.log(`[scan/run] Running ${flatPrompts.length} prompts across engines in parallel...`);
 
-    const runStaggered = (
+    const runParallel = (
       engineName: string,
       available: boolean,
-      delayMs: number,
       detectFn: (fp: FlatPrompt) => Promise<EngineResult>
     ): Promise<EngineResult[]> => {
       if (!available) {
         return Promise.resolve(flatPrompts.map(() => ({ appeared: false, snippet: "" })));
       }
-      return Promise.all(
+      return Promise.allSettled(
         flatPrompts.map((fp: FlatPrompt, i: number) =>
-          sleep(i * delayMs).then(async () => {
+          sleep(i * 50).then(() => {
             console.log(`  [${engineName}] prompt ${i + 1}/${flatPrompts.length}: "${fp.text.slice(0, 60)}..."`);
-            try {
-              return await detectFn(fp);
-            } catch (err) {
-              console.error(
-                `  [${engineName}] prompt ${i + 1} ERROR:`,
-                err instanceof Error ? `${err.name}: ${err.message}` : err
-              );
-              return { appeared: false, snippet: "" };
-            }
+            return detectFn(fp);
           })
         )
+      ).then((settled) =>
+        settled.map((r, i) => {
+          if (r.status === "fulfilled") return r.value;
+          console.error(
+            `  [${engineName}] prompt ${i + 1} ERROR:`,
+            r.reason instanceof Error ? `${r.reason.name}: ${r.reason.message}` : r.reason
+          );
+          return { appeared: false, snippet: "" };
+        })
       );
     };
 
     const [geminiResults, claudeResults, chatgptResults, perplexityResults] =
       await Promise.all([
-        runStaggered("gemini", geminiAvailable, 200, (fp) =>
+        runParallel("gemini", geminiAvailable, (fp) =>
           queryGeminiWithDetection(fp.text, companyName, domain, geminiKey)
         ),
-        runStaggered("claude", claudeAvailable, 150, (fp) =>
+        runParallel("claude", claudeAvailable, (fp) =>
           queryClaudeWithDetection(fp.text, companyName, domain, claudeKey)
         ),
-        runStaggered("chatgpt", chatgptAvailable, 100, (fp) =>
+        runParallel("chatgpt", chatgptAvailable, (fp) =>
           queryOpenAIWithDetection(fp.text, companyName, domain, openAIKey)
         ),
-        runStaggered("perplexity", perplexityAvailable, 100, (fp) =>
+        runParallel("perplexity", perplexityAvailable, (fp) =>
           queryPerplexityWithDetection(fp.text, companyName, domain, perplexityKey)
         ),
       ]);
