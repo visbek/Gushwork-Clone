@@ -162,7 +162,7 @@ export default function Home() {
 
   return (
     <main
-      className="min-h-screen text-white"
+      className="min-h-screen text-white overflow-x-hidden"
       style={{
         background: "#0a0a0a",
         fontFamily: "var(--font-inter, var(--font-geist-sans))",

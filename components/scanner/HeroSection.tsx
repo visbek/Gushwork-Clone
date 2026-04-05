@@ -20,10 +20,10 @@ export function HeroSection({
 
   return (
     <section
-      className={`grain-overlay overflow-hidden px-6 ${
+      className={`grain-overlay overflow-hidden px-4 sm:px-6 ${
         isIdle
-          ? "flex min-h-[calc(100vh-65px)] flex-col items-center justify-center py-20"
-          : "border-b py-10"
+          ? "flex min-h-[calc(100vh-65px)] flex-col items-center justify-center py-16 sm:py-20"
+          : "border-b py-8 sm:py-10"
       }`}
       style={{ borderColor: "#1a1a1a" }}
     >
@@ -86,9 +86,8 @@ export function HeroSection({
 
             {/* Headline */}
             <h1
-              className="mb-6 font-extrabold text-white animate-fade-in-up"
+              className="mb-6 font-extrabold text-white animate-fade-in-up text-[36px] sm:text-[52px] lg:text-[72px]"
               style={{
-                fontSize: "clamp(36px, 6vw, 72px)",
                 lineHeight: 1.05,
                 letterSpacing: "-0.025em",
                 fontFamily: "var(--font-geist-sans)",
@@ -112,9 +111,8 @@ export function HeroSection({
 
             {/* Subheadline */}
             <p
-              className="mb-10 animate-fade-in-up"
+              className="mb-8 sm:mb-10 text-base sm:text-[18px] animate-fade-in-up"
               style={{
-                fontSize: 18,
                 color: "#888",
                 lineHeight: 1.65,
                 animationDelay: "0.16s",
@@ -136,7 +134,7 @@ export function HeroSection({
             backdropFilter: "blur(12px)",
           }}
         >
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               value={domain}
@@ -146,12 +144,12 @@ export function HeroSection({
               }
               placeholder="yourdomain.com"
               disabled={isLoading}
-              className="flex-1 bg-transparent px-4 py-3 text-white placeholder-[#444] focus:outline-none text-sm disabled:opacity-50 min-w-0"
+              className="flex-1 bg-transparent px-4 py-3 text-white placeholder-[#444] focus:outline-none text-sm disabled:opacity-50 min-w-0 w-full"
             />
             <button
               onClick={() => onScan(domain)}
               disabled={isLoading || !domain.trim()}
-              className={`flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold transition-all whitespace-nowrap disabled:cursor-not-allowed ${
+              className={`flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold transition-all whitespace-nowrap disabled:cursor-not-allowed w-full sm:w-auto ${
                 isLoading
                   ? "bg-[#1a1a1a] text-[#555]"
                   : "bg-[#00D4AA] text-[#0a0a0a] hover:bg-[#00e4bb] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
@@ -244,7 +242,7 @@ export function HeroSection({
           </div>
 
           {/* Pain section */}
-          <div className="px-6 py-24 mx-auto max-w-6xl">
+          <div className="px-4 sm:px-6 py-16 sm:py-24 mx-auto max-w-6xl">
             <h2
               className="mb-12 text-center text-2xl font-bold text-white sm:text-3xl"
               style={{
@@ -349,10 +347,10 @@ export function HeroSection({
           </div>
 
           {/* Bottom CTA */}
-          <div className="px-6 py-24 text-center">
+          <div className="px-4 sm:px-6 py-16 sm:py-24 text-center">
             <div className="mx-auto max-w-2xl">
               <h2
-                className="mb-4 text-3xl font-bold text-white sm:text-4xl"
+                className="mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold text-white"
                 style={{
                   fontFamily: "var(--font-geist-sans)",
                   letterSpacing: "-0.025em",
@@ -360,7 +358,7 @@ export function HeroSection({
               >
                 Ready to see where you stand?
               </h2>
-              <p className="mb-10 text-sm" style={{ color: "#666" }}>
+              <p className="mb-8 sm:mb-10 text-sm" style={{ color: "#666" }}>
                 Free scan. No account. Takes 60 seconds.
               </p>
               <div
@@ -371,7 +369,7 @@ export function HeroSection({
                   backdropFilter: "blur(12px)",
                 }}
               >
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     value={domain}
@@ -380,12 +378,12 @@ export function HeroSection({
                       e.key === "Enter" && onScan(domain)
                     }
                     placeholder="yourdomain.com"
-                    className="flex-1 bg-transparent px-4 py-3 text-white placeholder-[#444] focus:outline-none text-sm min-w-0"
+                    className="flex-1 bg-transparent px-4 py-3 text-white placeholder-[#444] focus:outline-none text-sm min-w-0 w-full"
                   />
                   <button
                     onClick={() => onScan(domain)}
                     disabled={!domain.trim()}
-                    className="rounded-xl px-5 py-3 text-sm font-bold transition-all bg-[#00D4AA] text-[#0a0a0a] hover:bg-[#00e4bb] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                    className="rounded-xl px-5 py-3 text-sm font-bold transition-all bg-[#00D4AA] text-[#0a0a0a] hover:bg-[#00e4bb] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                   >
                     Check My AI Visibility →
                   </button>

@@ -220,7 +220,7 @@ export function ResultsSection({
   return (
     <section
       ref={sectionRef}
-      className="px-6 pb-24 pt-8 animate-fade-in-up"
+      className="px-4 sm:px-6 pb-16 sm:pb-24 pt-6 sm:pt-8 animate-fade-in-up"
     >
       {/* Toast */}
       {showToast && (
@@ -239,8 +239,10 @@ export function ResultsSection({
 
       <div className="mx-auto max-w-4xl">
         {/* Score */}
-        <div className="py-12 flex flex-col items-center gap-3">
-          <ScoreCircle score={scanData.overallScore} active={scoreActive} />
+        <div className="py-8 sm:py-12 flex flex-col items-center gap-3">
+          <div className="scale-75 sm:scale-100 origin-center">
+            <ScoreCircle score={scanData.overallScore} active={scoreActive} />
+          </div>
           <p
             className="text-xs font-semibold uppercase tracking-widest"
             style={{ color: "#555", letterSpacing: "0.14em" }}
@@ -248,7 +250,7 @@ export function ResultsSection({
             AI Visibility Score
           </p>
           <p
-            className={`text-lg font-semibold ${scoreTextClass(scanData.overallScore)}`}
+            className={`text-base sm:text-lg font-semibold ${scoreTextClass(scanData.overallScore)}`}
           >
             {scoreMessage(scanData.overallScore)}
           </p>
@@ -317,16 +319,16 @@ export function ResultsSection({
         {/* Results table */}
         <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "#222" }}>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px] text-sm">
+            <table className="w-full min-w-[480px] text-sm">
               <thead>
                 <tr style={{ borderBottom: "1px solid #222", background: "#0f0f0f" }}>
-                  <th className="px-5 py-3.5 text-left font-semibold text-gray-300 w-full">
+                  <th className="px-4 sm:px-5 py-3.5 text-left font-semibold text-gray-300 w-full">
                     Buyer Prompt
                   </th>
                   {ENGINES.map(({ key, label }) => (
                     <th
                       key={key}
-                      className="px-4 py-3.5 text-center font-semibold text-gray-300 whitespace-nowrap"
+                      className="hidden sm:table-cell px-4 py-3.5 text-center font-semibold text-gray-300 whitespace-nowrap"
                     >
                       {label}
                     </th>
@@ -419,10 +421,10 @@ export function ResultsSection({
                               (e.currentTarget.style.background = rowBg)
                             }
                           >
-                            <td className="px-5 py-4 text-gray-300 text-sm leading-relaxed">
+                            <td className="px-4 sm:px-5 py-4 text-gray-300 text-sm leading-relaxed">
                               {row.prompt}
                             </td>
-                            {ENGINES.map(({ key }) => {
+                            {ENGINES.map(({ key, label }) => {
                               const eng = scanData.engines?.[key];
                               const res = row[
                                 key as keyof Pick<
@@ -431,41 +433,50 @@ export function ResultsSection({
                                 >
                               ] as EngineResult | undefined;
                               return (
-                                <td key={key} className="px-4 py-4 text-center">
-                                  {!eng?.available ? (
+                                <td key={key} className="px-2 sm:px-4 py-3 sm:py-4 text-center align-middle">
+                                  <div className="flex flex-col items-center gap-1">
+                                    {/* Engine name badge — mobile only */}
                                     <span
-                                      style={{
-                                        filter: "grayscale(1)",
-                                        opacity: 0.25,
-                                        fontSize: 16,
-                                      }}
+                                      className="sm:hidden text-[9px] font-semibold uppercase tracking-wide"
+                                      style={{ color: "#555" }}
                                     >
-                                      🔒
+                                      {label}
                                     </span>
-                                  ) : res?.appeared ? (
-                                    <span
-                                      className="inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
-                                      title={res.snippet || "Appeared"}
-                                      style={{
-                                        background: "rgba(0,212,170,0.12)",
-                                        color: "#00D4AA",
-                                        border: "1px solid rgba(0,212,170,0.25)",
-                                      }}
-                                    >
-                                      ✓
-                                    </span>
-                                  ) : (
-                                    <span
-                                      className="inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
-                                      style={{
-                                        background: "rgba(239,68,68,0.1)",
-                                        color: "#ef4444",
-                                        border: "1px solid rgba(239,68,68,0.2)",
-                                      }}
-                                    >
-                                      ✗
-                                    </span>
-                                  )}
+                                    {!eng?.available ? (
+                                      <span
+                                        style={{
+                                          filter: "grayscale(1)",
+                                          opacity: 0.25,
+                                          fontSize: 16,
+                                        }}
+                                      >
+                                        🔒
+                                      </span>
+                                    ) : res?.appeared ? (
+                                      <span
+                                        className="inline-flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full text-xs font-bold"
+                                        title={res.snippet || "Appeared"}
+                                        style={{
+                                          background: "rgba(0,212,170,0.12)",
+                                          color: "#00D4AA",
+                                          border: "1px solid rgba(0,212,170,0.25)",
+                                        }}
+                                      >
+                                        ✓
+                                      </span>
+                                    ) : (
+                                      <span
+                                        className="inline-flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full text-xs font-bold"
+                                        style={{
+                                          background: "rgba(239,68,68,0.1)",
+                                          color: "#ef4444",
+                                          border: "1px solid rgba(239,68,68,0.2)",
+                                        }}
+                                      >
+                                        ✗
+                                      </span>
+                                    )}
+                                  </div>
                                 </td>
                               );
                             })}
@@ -708,7 +719,7 @@ export function ResultsSection({
 
         {/* Bottom CTA */}
         <div
-          className="mt-8 rounded-2xl p-8 text-center"
+          className="mt-8 rounded-2xl p-5 sm:p-8 text-center"
           style={{
             background: "rgba(0,212,170,0.04)",
             border: "1px solid rgba(0,212,170,0.18)",
