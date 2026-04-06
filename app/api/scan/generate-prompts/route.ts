@@ -39,7 +39,7 @@ function checkRateLimit(ip: string): boolean {
   return true; // allowed
 }
 
-// ─── 24-hour in-memory prompt cache ─────────────────────────────────────────
+// ─── 24-hour in-memory prompt cache + pending request lock ──────────────────
 
 interface CachedResult {
   data: unknown;
@@ -47,6 +47,7 @@ interface CachedResult {
 }
 
 const promptCache = new Map<string, CachedResult>();
+const pendingRequests = new Map<string, Promise<unknown>>();
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 function cleanCompanyName(name: string): string {
@@ -228,58 +229,16 @@ async function getWebsiteData(domain: string): Promise<WebsiteData | null> {
   return { url: successUrl, title, metaDescription, h1s, bodyText, brandVariations };
 }
 
-export async function POST(request: NextRequest) {
-  console.log("[generate-prompts] Route hit");
+// ─── Core generation logic (extracted for dedup lock) ────────────────────────
 
-  // ── IP rate limit check ──────────────────────────────────────────────────
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
-  if (!checkRateLimit(ip)) {
-    console.log(`[generate-prompts] Rate limit exceeded for IP: ${ip}`);
-    return NextResponse.json(
-      {
-        error: "rate_limit",
-        message:
-          "You have used your 3 free scans for today. Upgrade to scan unlimited domains.",
-      },
-      { status: 429 }
-    );
-  }
+async function generatePromptsForDomain(domain: string): Promise<unknown> {
+  console.log(`[generate-prompts] MISS for: ${domain}`);
 
-  try {
-    const body = await request.json();
-    const { domain } = body;
+  const websiteData = await getWebsiteData(domain);
 
-    console.log(`[generate-prompts] Domain received: "${domain}"`);
-
-    if (!domain || typeof domain !== "string") {
-      return NextResponse.json({ error: "domain is required" }, { status: 400 });
-    }
-
-    // Normalize domain so "www.boat-lifestyle.com" and "boat-lifestyle.com" hit the same cache key
-    const normalizedDomain = normalizeDomain(domain);
-    console.log(`[generate-prompts] Normalized domain: "${normalizedDomain}"`);
-
-    // Cache-bust if ?nocache=true
-    const nocache = request.nextUrl.searchParams.get("nocache");
-    if (nocache === "true") {
-      promptCache.delete(normalizedDomain);
-      console.log(`[generate-prompts] Cache cleared for "${normalizedDomain}" (nocache=true)`);
-    }
-
-    // Check 24-hour cache
-    const cached = promptCache.get(normalizedDomain);
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-      const ageMin = Math.round((Date.now() - cached.timestamp) / 60000);
-      console.log(`[generate-prompts] Cache HIT for "${normalizedDomain}" (${ageMin}m old) — returning cached prompts`);
-      return NextResponse.json(cached.data);
-    }
-    console.log(`[generate-prompts] Cache MISS for "${normalizedDomain}" — fetching website and calling Claude`);
-
-    const websiteData = await getWebsiteData(normalizedDomain);
-
-    let claudePrompt: string;
-    if (websiteData) {
-      claudePrompt = `Analyze this website and return a detailed JSON object. Read every field carefully — use the actual website content, not guesses.
+  let claudePrompt: string;
+  if (websiteData) {
+    claudePrompt = `Analyze this website and return a detailed JSON object. Read every field carefully — use the actual website content, not guesses.
 
 Website title: ${websiteData.title || "(not found)"}
 Meta description: ${websiteData.metaDescription || "(not found)"}
@@ -355,9 +314,9 @@ For ALL prompts:
 - IMPORTANT: Do NOT include any year (2024, 2025, 2026) in the prompts. Write timeless prompts that work regardless of year. Instead of "best protein powder India 2024" write "best protein powder India right now" or just "best protein powder India"
 - Each array must have exactly 6 prompts
 - For DISCOVERY and TRANSACTIONAL prompts: at least 3 of the 6 must be hyper-specific to THIS company's exact products — specific enough that this brand would appear in the answer. Include 2-3 branded/navigational queries where someone is specifically searching for this brand by name, product line, or founder. Examples: "SuperYou protein wafers where to buy India", "Ranveer Singh protein snack brand review", "boAt wireless neckband under 2000 gym". These branded queries must NOT mention the company name in generic category framing — they should read like a real person who already knows the brand and is searching for it directly`;
-    } else {
-      console.log(`[generate-prompts] Website fetch failed — falling back to domain-only prompt`);
-      claudePrompt = `Given the domain "${normalizedDomain}", infer what this company does and return this JSON structure.
+  } else {
+    console.log(`[generate-prompts] Website fetch failed — falling back to domain-only prompt`);
+    claudePrompt = `Given the domain "${domain}", infer what this company does and return this JSON structure.
 
 Return ONLY this JSON, no markdown, no explanation:
 
@@ -386,56 +345,120 @@ Return ONLY this JSON, no markdown, no explanation:
 
 informational: buyer learning about the category. discovery: buyer looking for vendors. commercial: buyer comparing options. transactional: buyer ready to purchase.
 Write all 24 prompts as long, conversational questions a real person would type into ChatGPT. Do NOT use the company name in generic category prompts, but DO include 2-3 branded/navigational queries in discovery and transactional where someone is searching for this brand specifically (by name or product).`;
+  }
+
+  console.log("[generate-prompts] Calling Claude for ICP analysis + 24 prompts...");
+
+  const message = await client.messages.create({
+    model: "claude-sonnet-4-5",
+    max_tokens: 3000,
+    messages: [{ role: "user", content: claudePrompt }],
+  });
+
+  const content = message.content[0];
+  if (content.type !== "text") {
+    throw new Error(`Unexpected response type from Claude: ${content.type}`);
+  }
+
+  const rawText = content.text;
+  console.log("[generate-prompts] Claude raw response (first 400 chars):", rawText.slice(0, 400));
+
+  const cleaned = stripCodeFences(rawText);
+  const parsed = JSON.parse(cleaned);
+
+  // Clean companyName: strip "by [Person Name]" and "- tagline" patterns
+  if (parsed?.businessProfile?.companyName) {
+    const original = parsed.businessProfile.companyName;
+    parsed.businessProfile.companyName = cleanCompanyName(original);
+    if (parsed.businessProfile.companyName !== original) {
+      console.log(`[generate-prompts] Cleaned companyName: "${original}" → "${parsed.businessProfile.companyName}"`);
+    }
+  }
+
+  // Attach brand variations — from HTML extraction if available, else domain-only fallback
+  parsed.brandVariations =
+    websiteData?.brandVariations?.length
+      ? websiteData.brandVariations
+      : extractBrandVariations("", domain);
+
+  console.log(`[generate-prompts] brandVariations: ${JSON.stringify(parsed.brandVariations)}`);
+  console.log("[generate-prompts] Parsed OK");
+  console.log("  businessProfile:", JSON.stringify(parsed.businessProfile));
+  console.log("  icp:", JSON.stringify(parsed.icp));
+  console.log("  informational prompts:", parsed.prompts?.informational?.length);
+  console.log("  discovery prompts:", parsed.prompts?.discovery?.length);
+  console.log("  commercial prompts:", parsed.prompts?.commercial?.length);
+  console.log("  transactional prompts:", parsed.prompts?.transactional?.length);
+
+  return parsed;
+}
+
+// ─── Route handler ────────────────────────────────────────────────────────────
+
+export async function POST(request: NextRequest) {
+  console.log("[generate-prompts] Route hit");
+
+  // ── IP rate limit check ──────────────────────────────────────────────────
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  if (!checkRateLimit(ip)) {
+    console.log(`[generate-prompts] Rate limit exceeded for IP: ${ip}`);
+    return NextResponse.json(
+      {
+        error: "rate_limit",
+        message:
+          "You have used your 3 free scans for today. Upgrade to scan unlimited domains.",
+      },
+      { status: 429 }
+    );
+  }
+
+  try {
+    const body = await request.json();
+    const { domain } = body;
+
+    console.log(`[generate-prompts] Domain received: "${domain}"`);
+
+    if (!domain || typeof domain !== "string") {
+      return NextResponse.json({ error: "domain is required" }, { status: 400 });
     }
 
-    console.log("[generate-prompts] Calling Claude for ICP analysis + 24 prompts...");
+    const normalizedDomain = normalizeDomain(domain);
+    console.log(`[generate-prompts] Normalized domain: "${normalizedDomain}"`);
 
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-5",
-      max_tokens: 3000,
-      messages: [{ role: "user", content: claudePrompt }],
-    });
-
-    const content = message.content[0];
-    if (content.type !== "text") {
-      throw new Error(`Unexpected response type from Claude: ${content.type}`);
+    // Cache-bust if ?nocache=true
+    const nocache = request.nextUrl.searchParams.get("nocache");
+    if (nocache === "true") {
+      promptCache.delete(normalizedDomain);
+      console.log(`[generate-prompts] Cache cleared for "${normalizedDomain}" (nocache=true)`);
     }
 
-    const rawText = content.text;
-    console.log("[generate-prompts] Claude raw response (first 400 chars):", rawText.slice(0, 400));
-
-    const cleaned = stripCodeFences(rawText);
-    const parsed = JSON.parse(cleaned);
-
-    // Clean companyName: strip "by [Person Name]" and "- tagline" patterns
-    if (parsed?.businessProfile?.companyName) {
-      const original = parsed.businessProfile.companyName;
-      parsed.businessProfile.companyName = cleanCompanyName(original);
-      if (parsed.businessProfile.companyName !== original) {
-        console.log(`[generate-prompts] Cleaned companyName: "${original}" → "${parsed.businessProfile.companyName}"`);
-      }
+    // Return cached result if exists and fresh
+    const cached = promptCache.get(normalizedDomain);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      const ageMin = Math.round((Date.now() - cached.timestamp) / 60000);
+      console.log(`[generate-prompts] Cache HIT for "${normalizedDomain}" (${ageMin}m old)`);
+      return NextResponse.json(cached.data);
     }
 
-    // Attach brand variations — from HTML extraction if available, else domain-only fallback
-    parsed.brandVariations =
-      websiteData?.brandVariations?.length
-        ? websiteData.brandVariations
-        : extractBrandVariations("", normalizedDomain);
+    // If same domain already being fetched, wait for it (dedup lock)
+    if (pendingRequests.has(normalizedDomain)) {
+      console.log(`[generate-prompts] PENDING for: ${normalizedDomain}`);
+      const result = await pendingRequests.get(normalizedDomain);
+      return NextResponse.json(result);
+    }
 
-    console.log(`[generate-prompts] brandVariations: ${JSON.stringify(parsed.brandVariations)}`);
-    console.log("[generate-prompts] Parsed OK");
-    console.log("  businessProfile:", JSON.stringify(parsed.businessProfile));
-    console.log("  icp:", JSON.stringify(parsed.icp));
-    console.log("  informational prompts:", parsed.prompts?.informational?.length);
-    console.log("  discovery prompts:", parsed.prompts?.discovery?.length);
-    console.log("  commercial prompts:", parsed.prompts?.commercial?.length);
-    console.log("  transactional prompts:", parsed.prompts?.transactional?.length);
+    // Start new fetch and register it as pending
+    const fetchPromise = generatePromptsForDomain(normalizedDomain);
+    pendingRequests.set(normalizedDomain, fetchPromise);
 
-    // Store in cache
-    promptCache.set(normalizedDomain, { data: parsed, timestamp: Date.now() });
-    console.log(`[generate-prompts] Cached result for "${normalizedDomain}" (valid for 24h)`);
-
-    return NextResponse.json(parsed);
+    try {
+      const result = await fetchPromise;
+      promptCache.set(normalizedDomain, { data: result, timestamp: Date.now() });
+      console.log(`[generate-prompts] Cached result for "${normalizedDomain}" (valid for 24h)`);
+      return NextResponse.json(result);
+    } finally {
+      pendingRequests.delete(normalizedDomain);
+    }
   } catch (error) {
     if (error instanceof SyntaxError) {
       console.error("[generate-prompts] JSON.parse failed:", error.message);
