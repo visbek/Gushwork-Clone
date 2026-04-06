@@ -182,7 +182,7 @@ html {
 body {
   background: var(--sp-bg);
   color: var(--sp-text);
-  font-family: var(--font-body, system-ui);
+  font-family: var(--font-body, system-ui); /* --font-body injected by Next.js via next/font/google (Inter) */
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
