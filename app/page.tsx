@@ -89,13 +89,13 @@ export default function Home() {
   // ── localStorage ────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    if (localStorage.getItem("visibilityai_email")) setEmailCaptured(true);
+    if (localStorage.getItem("sparrwo_email")) setEmailCaptured(true);
   }, []);
 
   useEffect(() => {
     if (scanData && domain) {
       const nd = domain.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/$/, "");
-      if (localStorage.getItem(`visibilityai_scanned_${nd}`)) setEmailCaptured(true);
+      if (localStorage.getItem(`sparrwo_scanned_${nd}`)) setEmailCaptured(true);
     }
   }, [scanData, domain]);
 
@@ -171,6 +171,7 @@ export default function Home() {
           businessProfile: icpData.businessProfile,
           icp: icpData.icp,
           prompts: icpData.prompts,
+          brandVariations: icpData.brandVariations,
         }),
       });
       if (!r2.ok) throw new Error("Failed to run scan");
@@ -195,13 +196,13 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailInput.trim(), domain: nd, score: scanData?.overallScore ?? 0 }),
       });
-      localStorage.setItem("visibilityai_email", emailInput.trim());
-      localStorage.setItem(`visibilityai_scanned_${nd}`, "true");
+      localStorage.setItem("sparrwo_email", emailInput.trim());
+      localStorage.setItem(`sparrwo_scanned_${nd}`, "true");
       setEmailCaptured(true);
       setShowToast(true);
       setTimeout(() => setShowToast(false), 5000);
     } catch {
-      localStorage.setItem("visibilityai_email", emailInput.trim());
+      localStorage.setItem("sparrwo_email", emailInput.trim());
       setEmailCaptured(true);
     } finally {
       setEmailSubmitting(false);

@@ -15,58 +15,22 @@ function normalizeDomain(input: string): string {
     .trim();
 }
 
-function detectBrand(
-  responseText: string,
-  companyName: string,
-  domain: string
-): boolean {
-  const text = responseText.toLowerCase();
-  const checks = new Set<string>();
-
-  console.log(`  [DETECT] companyName="${companyName}" domain="${domain}" responseLength=${responseText.length}`);
-
-  // Clean company name — remove common corporate suffixes
-  const cleanName = companyName
+function detectBrand(responseText: string, brandVariations: string[]): boolean {
+  // Normalize response: lowercase, collapse punctuation to spaces
+  const cleaned = responseText
     .toLowerCase()
-    .replace(
-      /\b(pvt|ltd|inc|llc|private|limited|lifestyle|technologies|tech|solutions|india|group)\b/g,
-      ""
-    )
-    .replace(/\s+/g, " ")
-    .trim();
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ");
 
-  checks.add(cleanName);
-
-  // Split on ANY non-alphanumeric character (dots, hyphens, spaces, etc.)
-  // "Lovable.dev" → ["lovable", "dev"], "my-app" → ["my", "app"]
-  cleanName.split(/[^a-z0-9]+/).forEach((word) => {
-    if (word.length >= 4) checks.add(word);
+  const found = brandVariations.find((v) => {
+    const variation = v.toLowerCase().replace(/[^a-z0-9\s]/g, " ").trim();
+    return variation.length >= 3 && cleaned.includes(variation);
   });
 
-  // Domain root — split on dots AND hyphens for compound domains
-  const fullDomainNorm = normalizeDomain(domain);
-  const domainRoot = fullDomainNorm.split(".")[0].toLowerCase();
-  checks.add(domainRoot);
-  domainRoot.split(/[^a-z0-9]+/).forEach((word) => {
-    if (word.length >= 4) checks.add(word);
-  });
-
-  // Compact variations
-  checks.add(domainRoot.replace(/-/g, ""));
-  checks.add(cleanName.replace(/\s+/g, ""));
-  checks.add(cleanName.replace(/\s+/g, "-"));
-
-  // Min 4 chars to avoid false positives on "the", "for", "app", etc.
-  const validChecks = [...checks].filter((c) => c.length >= 4);
-
-  console.log(`  [DETECT] Checking for: ${JSON.stringify(validChecks)}`);
-  console.log(`  [DETECT] Full text (${text.length} chars): "${text.slice(0, 300)}"`);
-
-  const found = validChecks.find((check) => text.includes(check));
   if (found) {
-    console.log(`  [DETECT] FOUND "${found}"`);
+    console.log("[DETECT] FOUND variation:", found);
   } else {
-    console.log(`  [DETECT] NOT FOUND in ${responseText.length} chars`);
+    console.log("[DETECT] NOT FOUND. Checked:", brandVariations.slice(0, 15));
   }
 
   return !!found;
@@ -89,25 +53,14 @@ interface FlatPrompt {
 
 type EngineResult = { appeared: boolean; snippet: string };
 
-function extractSnippet(
-  text: string,
-  companyName: string,
-  domain: string
-): string {
-  const lower = text.toLowerCase();
-  const cleanName = companyName.toLowerCase().replace(/\b(pvt|ltd|inc|llc|private|limited|lifestyle|technologies|tech|solutions|india|group)\b/g, "").trim();
-  const domainRoot = normalizeDomain(domain).split(".")[0];
-
-  const searchTerms = [
-    cleanName,
-    domainRoot,
-    cleanName.replace(/\s+/g, ""),
-    companyName.toLowerCase(),
-  ].filter((v) => v.length >= 3);
+function extractSnippet(text: string, brandVariations: string[]): string {
+  const cleaned = text.toLowerCase().replace(/[^a-z0-9\s]/g, " ");
 
   let matchIndex = -1;
-  for (const term of searchTerms) {
-    const idx = lower.indexOf(term);
+  for (const v of brandVariations) {
+    const variation = v.toLowerCase().replace(/[^a-z0-9\s]/g, " ").trim();
+    if (variation.length < 3) continue;
+    const idx = cleaned.indexOf(variation);
     if (idx !== -1) { matchIndex = idx; break; }
   }
 
@@ -121,8 +74,7 @@ function extractSnippet(
 
 async function queryGeminiWithDetection(
   prompt: string,
-  companyName: string,
-  domain: string,
+  brandVariations: string[],
   apiKey: string
 ): Promise<EngineResult> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
@@ -136,14 +88,12 @@ async function queryGeminiWithDetection(
     throw new Error(`Gemini error: ${res.status} — ${JSON.stringify(data)}`);
   }
   const responseText: string = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-  const appeared = detectBrand(responseText, companyName, domain);
-  return { appeared, snippet: extractSnippet(responseText, companyName, domain) };
+  return { appeared: detectBrand(responseText, brandVariations), snippet: extractSnippet(responseText, brandVariations) };
 }
 
 async function queryClaudeWithDetection(
   prompt: string,
-  companyName: string,
-  domain: string,
+  brandVariations: string[],
   apiKey: string
 ): Promise<EngineResult> {
   const client = new Anthropic({ apiKey });
@@ -154,14 +104,12 @@ async function queryClaudeWithDetection(
   });
   const responseText =
     message.content[0]?.type === "text" ? message.content[0].text : "";
-  const appeared = detectBrand(responseText, companyName, domain);
-  return { appeared, snippet: extractSnippet(responseText, companyName, domain) };
+  return { appeared: detectBrand(responseText, brandVariations), snippet: extractSnippet(responseText, brandVariations) };
 }
 
 async function queryOpenAIWithDetection(
   prompt: string,
-  companyName: string,
-  domain: string,
+  brandVariations: string[],
   apiKey: string
 ): Promise<EngineResult> {
   const client = new OpenAI({ apiKey });
@@ -171,14 +119,12 @@ async function queryOpenAIWithDetection(
     max_tokens: 1024,
   });
   const responseText = completion.choices[0]?.message?.content ?? "";
-  const appeared = detectBrand(responseText, companyName, domain);
-  return { appeared, snippet: extractSnippet(responseText, companyName, domain) };
+  return { appeared: detectBrand(responseText, brandVariations), snippet: extractSnippet(responseText, brandVariations) };
 }
 
 async function queryPerplexityWithDetection(
   prompt: string,
-  companyName: string,
-  domain: string,
+  brandVariations: string[],
   apiKey: string
 ): Promise<EngineResult> {
   const res = await fetch("https://api.perplexity.ai/chat/completions", {
@@ -198,8 +144,7 @@ async function queryPerplexityWithDetection(
   }
   const data = await res.json();
   const responseText: string = data.choices[0]?.message?.content ?? "";
-  const appeared = detectBrand(responseText, companyName, domain);
-  return { appeared, snippet: extractSnippet(responseText, companyName, domain) };
+  return { appeared: detectBrand(responseText, brandVariations), snippet: extractSnippet(responseText, brandVariations) };
 }
 
 // ─── Route handler ────────────────────────────────────────────────────────────
@@ -213,10 +158,12 @@ export async function POST(request: NextRequest) {
       domain: rawDomain,
       businessProfile,
       prompts: promptsByCategory,
+      brandVariations: rawBrandVariations,
     }: {
       domain: string;
       businessProfile: BusinessProfile;
       prompts: Record<Category, string[]>;
+      brandVariations?: string[];
     } = body;
 
     if (!rawDomain || typeof rawDomain !== "string") {
@@ -229,7 +176,20 @@ export async function POST(request: NextRequest) {
     const domain = normalizeDomain(rawDomain);
     const companyName = businessProfile?.companyName?.trim() || domain.split(".")[0];
 
+    // Use brand variations from generate-prompts; fallback to domain root if missing
+    const domainRoot = domain.split(".")[0];
+    const brandVariations: string[] =
+      Array.isArray(rawBrandVariations) && rawBrandVariations.length > 0
+        ? rawBrandVariations
+        : [
+            domainRoot,
+            domainRoot.replace(/-/g, ""),
+            companyName.toLowerCase(),
+            companyName.toLowerCase().replace(/\s+/g, ""),
+          ].filter((v) => v.length >= 3);
+
     console.log(`[scan/run] domain="${domain}" company="${companyName}"`);
+    console.log(`[scan/run] brandVariations: ${JSON.stringify(brandVariations)}`);
 
     // Flatten prompts: informational → discovery → commercial → transactional
     const CATEGORIES: Category[] = ["informational", "discovery", "commercial", "transactional"];
@@ -290,16 +250,16 @@ export async function POST(request: NextRequest) {
     const [geminiResults, claudeResults, chatgptResults, perplexityResults] =
       await Promise.all([
         runParallel("gemini", geminiAvailable, (fp) =>
-          queryGeminiWithDetection(fp.text, companyName, domain, geminiKey)
+          queryGeminiWithDetection(fp.text, brandVariations, geminiKey)
         ),
         runParallel("claude", claudeAvailable, (fp) =>
-          queryClaudeWithDetection(fp.text, companyName, domain, claudeKey)
+          queryClaudeWithDetection(fp.text, brandVariations, claudeKey)
         ),
         runParallel("chatgpt", chatgptAvailable, (fp) =>
-          queryOpenAIWithDetection(fp.text, companyName, domain, openAIKey)
+          queryOpenAIWithDetection(fp.text, brandVariations, openAIKey)
         ),
         runParallel("perplexity", perplexityAvailable, (fp) =>
-          queryPerplexityWithDetection(fp.text, companyName, domain, perplexityKey)
+          queryPerplexityWithDetection(fp.text, brandVariations, perplexityKey)
         ),
       ]);
 

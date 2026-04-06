@@ -20,9 +20,9 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "sparrwo — AI Search Visibility",
+  title: "sparrwo — Know where your brand lives in AI search",
   description:
-    "Know where your brand shows up in ChatGPT, Gemini, Claude & Perplexity.",
+    "sparrwo scans ChatGPT, Gemini, Claude & Perplexity to show exactly where buyers find your brand.",
 };
 
 export default function RootLayout({

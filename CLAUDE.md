@@ -1,4 +1,4 @@
-# VisibilityAI — Claude Code Memory File
+# sparrwo — Claude Code Memory File
 
 ## What this project is
 A B2B SaaS tool that helps growth-stage SaaS companies 

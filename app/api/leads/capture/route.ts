@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     resend.emails.send({
       from: "onboarding@resend.dev",
       to: "vish686@gmail.com", // TODO: replace with your actual email
-      subject: "New VisibilityAI Lead 🎯",
+      subject: "New sparrwo Lead 🎯",
       text: [
         "New scan completed!",
         "",

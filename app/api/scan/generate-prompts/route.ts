@@ -63,12 +63,84 @@ function stripCodeFences(text: string): string {
     .trim();
 }
 
+// ─── Brand variation extraction ──────────────────────────────────────────────
+
+function extractBrandVariations(html: string, domain: string): string[] {
+  const sources = new Set<string>();
+
+  // 1. og:site_name (most reliable — set explicitly by site owners)
+  const ogSite =
+    html.match(/<meta[^>]*property="og:site_name"[^>]*content="([^"]+)"/i) ??
+    html.match(/<meta[^>]*content="([^"]+)"[^>]*property="og:site_name"/i);
+  if (ogSite) sources.add(ogSite[1]);
+
+  // 2. og:title — take only the part before any separator
+  const ogTitle =
+    html.match(/<meta[^>]*property="og:title"[^>]*content="([^"]+)"/i) ??
+    html.match(/<meta[^>]*content="([^"]+)"[^>]*property="og:title"/i);
+  if (ogTitle) sources.add(ogTitle[1].split(/[|\-–:]/)[0].trim());
+
+  // 3. <title> tag — same trimming
+  const titleTag = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+  if (titleTag) sources.add(titleTag[1].split(/[|\-–:]/)[0].trim());
+
+  // 4. application-name meta
+  const appName =
+    html.match(/<meta[^>]*name="application-name"[^>]*content="([^"]+)"/i) ??
+    html.match(/<meta[^>]*content="([^"]+)"[^>]*name="application-name"/i);
+  if (appName) sources.add(appName[1]);
+
+  // 5. twitter:site handle (strip leading @)
+  const twitter =
+    html.match(/<meta[^>]*name="twitter:site"[^>]*content="@?([^"]+)"/i) ??
+    html.match(/<meta[^>]*content="@?([^"]+)"[^>]*name="twitter:site"/i);
+  if (twitter) sources.add(twitter[1].replace("@", ""));
+
+  // 6. Domain root — always included as final fallback
+  const domainRoot = domain
+    .replace(/^(https?:\/\/)?(www\.)?/, "")
+    .split(".")[0];
+  sources.add(domainRoot);
+
+  // Expand each source into all its variations
+  const allVariations = new Set<string>();
+
+  sources.forEach((v) => {
+    const clean = v.trim();
+    if (!clean || clean.length < 2) return;
+
+    // Full lowercased name: "clevertap", "boat lifestyle"
+    allVariations.add(clean.toLowerCase());
+
+    // Split camelCase: "CleverTap" → ["clever", "tap"]
+    clean
+      .replace(/([A-Z])/g, " $1")
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((w) => w.length >= 3)
+      .forEach((w) => allVariations.add(w));
+
+    // Remove spaces: "Clever Tap" → "clevertap"
+    allVariations.add(clean.toLowerCase().replace(/\s+/g, ""));
+
+    // Replace spaces with hyphen: "clever-tap"
+    allVariations.add(clean.toLowerCase().replace(/\s+/g, "-"));
+
+    // Strip all non-alphanumeric: "bo@t" → "bot"
+    allVariations.add(clean.toLowerCase().replace(/[^a-z0-9]/g, ""));
+  });
+
+  return [...allVariations].filter((v) => v.length >= 3);
+}
+
 interface WebsiteData {
   url: string;
   title: string;
   metaDescription: string;
   h1s: string[];
   bodyText: string;
+  brandVariations: string[];
 }
 
 async function tryFetch(url: string): Promise<string | null> {
@@ -144,13 +216,16 @@ async function getWebsiteData(domain: string): Promise<WebsiteData | null> {
     .trim()
     .slice(0, 1500);
 
+  const brandVariations = extractBrandVariations(html, domain);
+
   console.log(`[generate-prompts] Extracted from ${successUrl}:`);
   console.log(`  title: "${title}"`);
   console.log(`  metaDescription: "${metaDescription.slice(0, 150)}"`);
   console.log(`  h1s: ${JSON.stringify(h1s)}`);
+  console.log(`  brandVariations: ${JSON.stringify(brandVariations)}`);
   console.log(`  bodyText (first 200): "${bodyText.slice(0, 200)}"`);
 
-  return { url: successUrl, title, metaDescription, h1s, bodyText };
+  return { url: successUrl, title, metaDescription, h1s, bodyText, brandVariations };
 }
 
 export async function POST(request: NextRequest) {
@@ -341,6 +416,13 @@ Write all 24 prompts as long, conversational questions a real person would type 
       }
     }
 
+    // Attach brand variations — from HTML extraction if available, else domain-only fallback
+    parsed.brandVariations =
+      websiteData?.brandVariations?.length
+        ? websiteData.brandVariations
+        : extractBrandVariations("", normalizedDomain);
+
+    console.log(`[generate-prompts] brandVariations: ${JSON.stringify(parsed.brandVariations)}`);
     console.log("[generate-prompts] Parsed OK");
     console.log("  businessProfile:", JSON.stringify(parsed.businessProfile));
     console.log("  icp:", JSON.stringify(parsed.icp));
