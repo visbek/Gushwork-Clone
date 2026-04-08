@@ -238,14 +238,15 @@ export async function POST(request: NextRequest) {
     const runParallel = (
       engineName: string,
       available: boolean,
-      detectFn: (fp: FlatPrompt) => Promise<EngineResult>
+      detectFn: (fp: FlatPrompt) => Promise<EngineResult>,
+      staggerMs = 50
     ): Promise<EngineResult[]> => {
       if (!available) {
         return Promise.resolve(flatPrompts.map(() => ({ appeared: false, snippet: "" })));
       }
       return Promise.allSettled(
         flatPrompts.map((fp: FlatPrompt, i: number) =>
-          sleep(i * 50).then(() => {
+          sleep(i * staggerMs).then(() => {
             console.log(`  [${engineName}] prompt ${i + 1}/${flatPrompts.length}: "${fp.text.slice(0, 60)}..."`);
             return detectFn(fp);
           })
@@ -268,7 +269,8 @@ export async function POST(request: NextRequest) {
           queryGeminiWithDetection(fp.text, brandVariations, geminiKey)
         ),
         runParallel("claude", claudeAvailable, (fp) =>
-          queryClaudeWithDetection(fp.text, brandVariations, claudeKey)
+          queryClaudeWithDetection(fp.text, brandVariations, claudeKey),
+          300
         ),
         runParallel("chatgpt", chatgptAvailable, (fp) =>
           queryOpenAIWithDetection(fp.text, brandVariations, openAIKey)
