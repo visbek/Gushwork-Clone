@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { fetchResearchData } from "../research/route";
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -236,9 +237,47 @@ async function generatePromptsForDomain(domain: string): Promise<unknown> {
 
   const websiteData = await getWebsiteData(domain);
 
+  // Derive search terms from available website data (before Claude runs)
+  const industryHint = websiteData
+    ? (websiteData.title.split(/[|\-–]/).slice(1).join(" ").trim() ||
+       websiteData.metaDescription.slice(0, 60))
+    : domain;
+  const companyHint = websiteData?.brandVariations[0] ?? domain.split(".")[0];
+
+  // Fetch real internet data in parallel with no blocking on failure
+  const researchData = await fetchResearchData(industryHint, companyHint);
+
+  const hasResearch =
+    researchData.redditTitles.length > 0 ||
+    researchData.peopleAlsoAsk.length > 0 ||
+    researchData.youtubeTitles.length > 0 ||
+    researchData.quoraTitles.length > 0;
+
+  const researchBlock = hasResearch
+    ? `
+REAL DATA from the internet about this industry:
+
+Reddit discussions (real buyer questions):
+${researchData.redditTitles.slice(0, 5).join("\n")}
+
+Google People Also Ask (real searches):
+${researchData.peopleAlsoAsk.slice(0, 5).join("\n")}
+
+YouTube searches (real queries):
+${researchData.youtubeTitles.slice(0, 5).join("\n")}
+
+Quora questions (real buyer questions):
+${researchData.quoraTitles.slice(0, 5).join("\n")}
+
+Use the REAL DATA above as inspiration for how real buyers actually talk and search. Make the prompts sound exactly like real people — not marketing language.
+`
+    : "";
+
   let claudePrompt: string;
   if (websiteData) {
-    claudePrompt = `Analyze this website and return a detailed JSON object. Read every field carefully — use the actual website content, not guesses.
+    claudePrompt = `You are generating search prompts for an AI visibility scanner.
+${researchBlock}
+Analyze this website and return a detailed JSON object. Read every field carefully — use the actual website content, not guesses.
 
 Website title: ${websiteData.title || "(not found)"}
 Meta description: ${websiteData.metaDescription || "(not found)"}
@@ -316,7 +355,9 @@ For ALL prompts:
 - For DISCOVERY and TRANSACTIONAL prompts: at least 3 of the 6 must be hyper-specific to THIS company's exact products — specific enough that this brand would appear in the answer. Include 2-3 branded/navigational queries where someone is specifically searching for this brand by name, product line, or founder. Examples: "SuperYou protein wafers where to buy India", "Ranveer Singh protein snack brand review", "boAt wireless neckband under 2000 gym". These branded queries must NOT mention the company name in generic category framing — they should read like a real person who already knows the brand and is searching for it directly`;
   } else {
     console.log(`[generate-prompts] Website fetch failed — falling back to domain-only prompt`);
-    claudePrompt = `Given the domain "${domain}", infer what this company does and return this JSON structure.
+    claudePrompt = `You are generating search prompts for an AI visibility scanner.
+${researchBlock}
+Given the domain "${domain}", infer what this company does and return this JSON structure.
 
 Return ONLY this JSON, no markdown, no explanation:
 

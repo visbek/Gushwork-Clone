@@ -40,6 +40,12 @@
 - [x] 24h in-memory prompt cache keyed by normalized domain
 - [x] Year references removed from prompts (timeless queries only)
 - [x] nocache query param available for manual cache-busting (?nocache=true)
+- [x] Cache race condition fixed: pendingRequests dedup lock (simultaneous scans share one promise)
+- [x] Real query engine: /api/scan/research fetches Reddit, Google PAA, Quora, YouTube in parallel
+  - Reddit: public JSON search (no key needed)
+  - Google People Also Ask + Quora + YouTube: Serper API (SERPER_API_KEY)
+  - Each source fails independently, never blocks the others
+  - Research data injected into Claude prompt as real buyer language examples
 
 ## Blocked on (need before proceeding)
 - Supabase account (Phase 2)
