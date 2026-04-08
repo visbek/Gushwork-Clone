@@ -1,5 +1,4 @@
 import Anthropic from "@anthropic-ai/sdk";
-import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
 
 function sleep(ms: number) {
@@ -116,13 +115,24 @@ async function queryOpenAIWithDetection(
   brandVariations: string[],
   apiKey: string
 ): Promise<EngineResult> {
-  const client = new OpenAI({ apiKey });
-  const completion = await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    max_tokens: 1024,
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 500,
+    }),
   });
-  const responseText = completion.choices[0]?.message?.content ?? "";
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`OpenAI error: ${res.status} — ${body}`);
+  }
+  const data = await res.json();
+  const responseText: string = data.choices?.[0]?.message?.content ?? "";
   return { appeared: detectBrand(responseText, brandVariations), snippet: extractSnippet(responseText, brandVariations) };
 }
 
