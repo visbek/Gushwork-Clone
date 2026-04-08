@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { type ScanStatus, type EngineState } from "@/components/scanner/types";
 
 const ENGINES = [
@@ -20,6 +21,19 @@ const SCAN_TEXTS = [
   "Building your report...",
 ];
 
+const LOG_LINES = [
+  "Fetching website content...",
+  "Extracting brand signals...",
+  "Running ICP analysis...",
+  "Querying Gemini 2.5 Flash...",
+  "Brand detected in response #3...",
+  "Querying Claude Sonnet...",
+  "Running ChatGPT-4o queries...",
+  "Querying Perplexity API...",
+  "Calculating visibility score...",
+  "Building your report...",
+];
+
 interface ScanningAnimationProps {
   status: ScanStatus;
   engineStates: Record<string, EngineState>;
@@ -29,6 +43,36 @@ interface ScanningAnimationProps {
 export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAnimationProps) {
   void status;
   void engineStates;
+
+  const [promptCount, setPromptCount] = useState(0);
+  const [visibleLogs, setVisibleLogs] = useState<string[]>([]);
+
+  // Counter: 0 → 24 at ~1 per 1.2s
+  useEffect(() => {
+    setPromptCount(0);
+    let count = 0;
+    const id = setInterval(() => {
+      count++;
+      setPromptCount(count);
+      if (count >= 24) clearInterval(id);
+    }, 1200);
+    return () => clearInterval(id);
+  }, []);
+
+  // Log feed: one new line every 2.2s, keep last 4
+  useEffect(() => {
+    setVisibleLogs([]);
+    let idx = 0;
+    const id = setInterval(() => {
+      if (idx >= LOG_LINES.length) {
+        clearInterval(id);
+        return;
+      }
+      const line = LOG_LINES[idx++];
+      setVisibleLogs((prev) => [...prev, line].slice(-4));
+    }, 2200);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <section
@@ -52,11 +96,10 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
             position: "relative",
             width: 72,
             height: 72,
-            marginBottom: 40,
+            marginBottom: 32,
             flexShrink: 0,
           }}
         >
-          {/* Dashed spinning ring */}
           <div
             className="sp-ring-spin"
             style={{
@@ -66,7 +109,6 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
               borderRadius: "50%",
             }}
           />
-          {/* Pulsing violet dot at center */}
           <div
             className="animate-sp-pulse"
             style={{
@@ -89,7 +131,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
             fontSize: 13,
             color: "#888888",
             letterSpacing: "0.05em",
-            marginBottom: 56,
+            marginBottom: 40,
             textAlign: "center",
             minHeight: 20,
           }}
@@ -97,8 +139,36 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
           {SCAN_TEXTS[textIdx % SCAN_TEXTS.length]}
         </p>
 
+        {/* Large prompt counter */}
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <div
+            style={{
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: 72,
+              fontWeight: 700,
+              color: "#ffffff",
+              lineHeight: 1,
+              letterSpacing: "-0.04em",
+            }}
+          >
+            {String(promptCount).padStart(2, "0")}
+          </div>
+          <p
+            style={{
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: 10,
+              color: "#444444",
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              marginTop: 10,
+            }}
+          >
+            prompts running
+          </p>
+        </div>
+
         {/* Engine rows */}
-        <div style={{ width: "100%" }}>
+        <div style={{ width: "100%", marginBottom: 40 }}>
           {ENGINES.map((eng, i) => (
             <div
               key={eng.key}
@@ -183,6 +253,83 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
               </span>
             </div>
           ))}
+        </div>
+
+        {/* Terminal log feed */}
+        <div
+          style={{
+            width: "100%",
+            borderTop: "1px solid #1f1f1f",
+            paddingTop: 24,
+            minHeight: 96,
+          }}
+        >
+          {visibleLogs.map((line, i) => {
+            const fromEnd = visibleLogs.length - 1 - i;
+            const opacity =
+              fromEnd === 0 ? 1 : fromEnd === 1 ? 0.65 : fromEnd === 2 ? 0.35 : 0.15;
+            return (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  marginBottom: 8,
+                  opacity,
+                  transition: "opacity 0.4s ease",
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono, monospace)",
+                    fontSize: 12,
+                    color: "#444444",
+                    flexShrink: 0,
+                    userSelect: "none",
+                  }}
+                >
+                  &gt;
+                </span>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono, monospace)",
+                    fontSize: 12,
+                    color: "#7c3aed",
+                    letterSpacing: "0.02em",
+                  }}
+                >
+                  {line}
+                </span>
+              </div>
+            );
+          })}
+          {/* blinking cursor on last line */}
+          {visibleLogs.length > 0 && (
+            <div style={{ display: "flex", gap: 10 }}>
+              <span
+                style={{
+                  fontFamily: "var(--font-mono, monospace)",
+                  fontSize: 12,
+                  color: "#444444",
+                  userSelect: "none",
+                }}
+              >
+                &gt;
+              </span>
+              <span
+                className="animate-blink-dot"
+                style={{
+                  display: "inline-block",
+                  width: 7,
+                  height: 14,
+                  background: "#7c3aed",
+                  borderRadius: 1,
+                  verticalAlign: "middle",
+                  marginTop: 1,
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
     </section>

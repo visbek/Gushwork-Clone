@@ -109,7 +109,19 @@
   --sp-row-hover: #141414;
 }
 
-/* ── sparrwo light mode (preserved) ─────────────────────── */
+/* ── sparrwo dark mode explicit ─────────────────────────── */
+html.dark {
+  --background: #000000;
+  --text-primary: #ffffff;
+}
+
+/* ── sparrwo light mode ──────────────────────────────────── */
+html:not(.dark) {
+  --background: #ffffff;
+  --text-primary: #0a0a0a;
+}
+
+html:not(.dark),
 html.light {
   --sp-bg: #ffffff;
   --sp-bg-section: #f8f8f8;

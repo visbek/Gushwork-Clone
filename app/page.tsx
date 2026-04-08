@@ -43,7 +43,7 @@ export default function Home() {
   const [scanData, setScanData] = useState<ScanData | null>(null);
 
   // Theme
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [isDark, setIsDark] = useState(true);
 
   // Email wall state
   const [emailCaptured, setEmailCaptured] = useState(false);
@@ -66,24 +66,17 @@ export default function Home() {
   // ── Theme init ───────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    const saved = (localStorage.getItem("sparrwo_theme") ?? "dark") as "dark" | "light";
-    setTheme(saved);
-    if (saved === "light") {
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
-    }
+    const saved = localStorage.getItem("theme");
+    const dark = saved ? saved === "dark" : true;
+    setIsDark(dark);
+    document.documentElement.classList.toggle("dark", dark);
   }, []);
 
   function toggleTheme() {
-    const next: "dark" | "light" = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    localStorage.setItem("sparrwo_theme", next);
-    if (next === "light") {
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
-    }
+    const newDark = !isDark;
+    setIsDark(newDark);
+    document.documentElement.classList.toggle("dark", newDark);
+    localStorage.setItem("theme", newDark ? "dark" : "light");
   }
 
   // ── localStorage ────────────────────────────────────────────────────────────
@@ -257,7 +250,7 @@ export default function Home() {
               onMouseLeave={(e) => (e.currentTarget.style.color = "#444444")}
               aria-label="Toggle theme"
             >
-              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+              {isDark ? <SunIcon /> : <MoonIcon />}
             </button>
 
             {/* Try Free */}
