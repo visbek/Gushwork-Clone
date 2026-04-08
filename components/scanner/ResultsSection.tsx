@@ -16,7 +16,7 @@ const ENGINES = [
   { key: "gemini" as const, label: "Gemini", color: "#4285f4" },
   { key: "claude" as const, label: "Claude", color: "#d97706" },
   { key: "chatgpt" as const, label: "ChatGPT", color: "#10a37f" },
-  { key: "perplexity" as const, label: "Perplexity", color: "#7c3aed" },
+  { key: "perplexity" as const, label: "Perplexity", color: "#f97316" },
 ] as const;
 
 const CATEGORIES = [
@@ -35,9 +35,9 @@ const CATEGORIES = [
     label: "Discovery",
     description: "Buyer looking for vendors",
     badgeStyle: {
-      border: "1px solid #2d1f6e",
-      color: "#7c3aed",
-      background: "#170d3c",
+      border: "1px solid #7c2d12",
+      color: "#f97316",
+      background: "#1c0a00",
     },
   },
   {
@@ -237,9 +237,9 @@ export function ResultsSection({
         <div
           className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-fade-in-up"
           style={{
-            border: "1px solid rgba(124,58,237,0.4)",
-            background: "rgba(124,58,237,0.12)",
-            color: "#7c3aed",
+            border: "1px solid rgba(249,115,22,0.4)",
+            background: "rgba(249,115,22,0.12)",
+            color: "#f97316",
             borderRadius: 8,
             padding: "12px 20px",
             fontSize: 13,
@@ -565,7 +565,7 @@ export function ResultsSection({
                                   padding: "40px 32px",
                                   textAlign: "center",
                                   background: "#000000",
-                                  boxShadow: "0 0 0 1px #7c3aed, 0 0 30px rgba(124,58,237,0.1)",
+                                  boxShadow: "0 0 0 1px #f97316, 0 0 30px rgba(249,115,22,0.1)",
                                 }}
                               >
                                 {/* Lock icon */}
@@ -574,15 +574,15 @@ export function ResultsSection({
                                     width: 44,
                                     height: 44,
                                     borderRadius: 8,
-                                    border: "1px solid rgba(124,58,237,0.3)",
-                                    background: "rgba(124,58,237,0.08)",
+                                    border: "1px solid rgba(249,115,22,0.3)",
+                                    background: "rgba(249,115,22,0.08)",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
                                     margin: "0 auto 16px",
                                   }}
                                 >
-                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                                   </svg>
@@ -592,7 +592,7 @@ export function ResultsSection({
                                   style={{
                                     fontFamily: "var(--font-mono, monospace)",
                                     fontSize: 11,
-                                    color: "#7c3aed",
+                                    color: "#f97316",
                                     letterSpacing: "0.1em",
                                     textTransform: "uppercase",
                                     marginBottom: 12,
@@ -648,7 +648,7 @@ export function ResultsSection({
                                       style={{
                                         width: "100%",
                                         background: "#0c0c0c",
-                                        border: `1px solid ${emailFocused ? "#7c3aed" : "#1f1f1f"}`,
+                                        border: `1px solid ${emailFocused ? "#f97316" : "#1f1f1f"}`,
                                         borderRadius: 8,
                                         padding: emailInput || emailFocused ? "22px 16px 8px" : "14px 16px",
                                         fontSize: 14,
@@ -666,7 +666,7 @@ export function ResultsSection({
                                         top: emailInput || emailFocused ? 7 : "50%",
                                         transform: emailInput || emailFocused ? "none" : "translateY(-50%)",
                                         fontSize: emailInput || emailFocused ? 10 : 14,
-                                        color: emailFocused ? "#7c3aed" : "#444444",
+                                        color: emailFocused ? "#f97316" : "#444444",
                                         pointerEvents: "none",
                                         transition: "all 150ms ease",
                                         fontFamily: "var(--font-body, system-ui)",
@@ -685,7 +685,7 @@ export function ResultsSection({
                                     disabled={emailSubmitting}
                                     style={{
                                       width: "100%",
-                                      background: "#7c3aed",
+                                      background: "#f97316",
                                       color: "#ffffff",
                                       border: "none",
                                       borderRadius: 8,
@@ -697,8 +697,8 @@ export function ResultsSection({
                                       transition: "background 150ms ease",
                                       opacity: emailSubmitting ? 0.6 : 1,
                                     }}
-                                    onMouseEnter={(e) => { if (!emailSubmitting) e.currentTarget.style.background = "#6d28d9"; }}
-                                    onMouseLeave={(e) => (e.currentTarget.style.background = "#7c3aed")}
+                                    onMouseEnter={(e) => { if (!emailSubmitting) e.currentTarget.style.background = "#ea6c00"; }}
+                                    onMouseLeave={(e) => (e.currentTarget.style.background = "#f97316")}
                                   >
                                     {emailSubmitting ? "Unlocking..." : "Get My Full Report →"}
                                   </button>
@@ -811,8 +811,8 @@ export function ResultsSection({
         <div
           style={{
             marginTop: 24,
-            background: "rgba(124,58,237,0.08)",
-            border: "1px solid rgba(124,58,237,0.3)",
+            background: "rgba(249,115,22,0.08)",
+            border: "1px solid rgba(249,115,22,0.3)",
             borderRadius: 8,
             padding: "40px 32px",
             textAlign: "center",
@@ -843,7 +843,7 @@ export function ResultsSection({
           </p>
           <button
             style={{
-              background: "#7c3aed",
+              background: "#f97316",
               color: "#ffffff",
               border: "none",
               borderRadius: 8,
@@ -854,8 +854,8 @@ export function ResultsSection({
               cursor: "pointer",
               transition: "background 150ms ease",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#6d28d9")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "#7c3aed")}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#ea6c00")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#f97316")}
           >
             Get Weekly Reports — $49/mo
           </button>

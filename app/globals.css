@@ -61,12 +61,12 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.1 0 0);
   --muted-foreground: oklch(0.55 0 0);
-  --accent: oklch(0.45 0.18 295);
+  --accent: oklch(0.72 0.20 42);
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.15 0 0);
   --input: oklch(0.15 0 0);
-  --ring: oklch(0.45 0.18 295);
+  --ring: oklch(0.72 0.20 42);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -75,12 +75,12 @@
   --radius: 0.5rem;
   --sidebar: oklch(0.05 0 0);
   --sidebar-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.45 0.18 295);
+  --sidebar-primary: oklch(0.72 0.20 42);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.1 0 0);
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(0.15 0 0);
-  --sidebar-ring: oklch(0.45 0.18 295);
+  --sidebar-ring: oklch(0.72 0.20 42);
 
   /* ── sparrwo theme ─────────────────────────────────────── */
   --sp-bg: #000000;
@@ -94,10 +94,11 @@
   --sp-text-2: #888888;
   --sp-text-3: #888888;
   --sp-text-4: #444444;
-  --sp-accent: #7c3aed;
-  --sp-accent-dim: #3b1f6b;
-  --sp-accent-bg: rgba(124, 58, 237, 0.08);
-  --sp-accent-border: rgba(124, 58, 237, 0.3);
+  --sp-accent: #f97316;
+  --sp-accent-dim: #7c2d12;
+  --sp-accent-hover: #ea6c00;
+  --sp-accent-bg: rgba(249, 115, 22, 0.08);
+  --sp-accent-border: rgba(249, 115, 22, 0.3);
   --sp-success: #22c55e;
   --sp-error: #ef4444;
   --sp-nav-bg: #000000;
@@ -134,10 +135,11 @@ html.light {
   --sp-text-2: #444444;
   --sp-text-3: #777777;
   --sp-text-4: #aaaaaa;
-  --sp-accent: #7c3aed;
-  --sp-accent-dim: #c4b5fd;
-  --sp-accent-bg: rgba(124, 58, 237, 0.07);
-  --sp-accent-border: rgba(124, 58, 237, 0.2);
+  --sp-accent: #f97316;
+  --sp-accent-dim: #fed7aa;
+  --sp-accent-hover: #ea6c00;
+  --sp-accent-bg: rgba(249, 115, 22, 0.07);
+  --sp-accent-border: rgba(249, 115, 22, 0.2);
   --sp-nav-bg: rgba(255, 255, 255, 0.95);
   --sp-nav-border: rgba(0, 0, 0, 0.07);
   --sp-input-bg: rgba(0, 0, 0, 0.02);

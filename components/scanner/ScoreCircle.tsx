@@ -43,7 +43,7 @@ export function ScoreCircle({ score, active }: { score: number; active: boolean 
   }, [active]);
 
   const offset = go ? CIRC * (1 - score / 100) : CIRC;
-  const arcColor = "#7c3aed";
+  const arcColor = "#f97316";
 
   return (
     <div className="relative" style={{ width: 160, height: 160 }}>
@@ -62,7 +62,7 @@ export function ScoreCircle({ score, active }: { score: number; active: boolean 
           transform="rotate(-90 80 80)"
           style={{
             transition: "stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)",
-            filter: "drop-shadow(0 0 8px rgba(124,58,237,0.6))",
+            filter: "drop-shadow(0 0 8px rgba(249,115,22,0.6))",
           }}
         />
       </svg>

@@ -241,7 +241,7 @@ export default function Home() {
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}
-              className="w-8 h-8 flex items-center justify-center rounded-full"
+              className="w-8 h-8 flex items-center justify-center rounded-sm"
               style={{
                 color: "#444444",
                 transition: "color 150ms ease",
@@ -258,12 +258,12 @@ export default function Home() {
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               className="hidden sm:block px-4 py-1.5 text-xs font-bold rounded-lg"
               style={{
-                background: "#7c3aed",
+                background: "#f97316",
                 color: "#ffffff",
                 transition: "background 150ms ease",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#6d28d9")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "#7c3aed")}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ea6c00")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#f97316")}
             >
               Try Free
             </button>
@@ -295,7 +295,7 @@ export default function Home() {
             </p>
             <a
               href="/pricing"
-              className="inline-block rounded-full px-6 py-2.5 text-sm font-bold transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-block rounded-sm px-6 py-2.5 text-sm font-bold transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
               style={{ background: "var(--sp-accent)", color: "#fff" }}
             >
               Upgrade for unlimited scans →

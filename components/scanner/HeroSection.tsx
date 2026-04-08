@@ -117,7 +117,7 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
             onClick={() => onScan(domain)}
             disabled={isLoading || !domain.trim()}
             style={{
-              background: isLoading ? "#141414" : "#7c3aed",
+              background: isLoading ? "#141414" : "#f97316",
               color: isLoading ? "#444444" : "#ffffff",
               border: "none",
               borderRadius: 8,
@@ -135,10 +135,10 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
               flexShrink: 0,
             }}
             onMouseEnter={(e) => {
-              if (!isLoading && domain.trim()) e.currentTarget.style.background = "#6d28d9";
+              if (!isLoading && domain.trim()) e.currentTarget.style.background = "#ea6c00";
             }}
             onMouseLeave={(e) => {
-              if (!isLoading) e.currentTarget.style.background = isLoading ? "#141414" : "#7c3aed";
+              if (!isLoading) e.currentTarget.style.background = isLoading ? "#141414" : "#f97316";
             }}
           >
             {isLoading ? (
@@ -282,7 +282,7 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                     style={{
                       fontFamily: "var(--font-mono, monospace)",
                       fontSize: 11,
-                      color: "#7c3aed",
+                      color: "#f97316",
                       letterSpacing: "0.1em",
                       marginBottom: 16,
                     }}
@@ -358,8 +358,8 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                         width: 48,
                         height: 48,
                         borderRadius: 8,
-                        border: "1px solid rgba(124,58,237,0.3)",
-                        background: "rgba(124,58,237,0.08)",
+                        border: "1px solid rgba(249,115,22,0.3)",
+                        background: "rgba(249,115,22,0.08)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -367,7 +367,7 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                         fontFamily: "var(--font-mono, monospace)",
                         fontSize: 13,
                         fontWeight: 700,
-                        color: "#7c3aed",
+                        color: "#f97316",
                       }}
                     >
                       {item.step}
@@ -444,7 +444,7 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                   onClick={() => onScan(domain)}
                   disabled={!domain.trim()}
                   style={{
-                    background: "#7c3aed",
+                    background: "#f97316",
                     color: "#ffffff",
                     border: "none",
                     borderRadius: 8,
@@ -459,9 +459,9 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                     flexShrink: 0,
                   }}
                   onMouseEnter={(e) => {
-                    if (domain.trim()) e.currentTarget.style.background = "#6d28d9";
+                    if (domain.trim()) e.currentTarget.style.background = "#ea6c00";
                   }}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "#7c3aed")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "#f97316")}
                 >
                   Check My Visibility
                 </button>

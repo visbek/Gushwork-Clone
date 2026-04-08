@@ -7,7 +7,7 @@ const ENGINES = [
   { key: "gemini" as const, label: "Gemini", abbr: "G", color: "#4285f4" },
   { key: "claude" as const, label: "Claude", abbr: "C", color: "#d97706" },
   { key: "chatgpt" as const, label: "ChatGPT", abbr: "GPT", color: "#10a37f" },
-  { key: "perplexity" as const, label: "Perplexity", abbr: "P", color: "#7c3aed" },
+  { key: "perplexity" as const, label: "Perplexity", abbr: "P", color: "#f97316" },
 ] as const;
 
 const SCAN_TEXTS = [
@@ -105,7 +105,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
             style={{
               position: "absolute",
               inset: 0,
-              border: "2px dashed #7c3aed",
+              border: "2px dashed #f97316",
               borderRadius: "50%",
             }}
           />
@@ -119,7 +119,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
               width: 8,
               height: 8,
               borderRadius: "50%",
-              background: "#7c3aed",
+              background: "#f97316",
             }}
           />
         </div>
@@ -230,7 +230,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
                     top: 0,
                     left: 0,
                     height: "100%",
-                    background: "#7c3aed",
+                    background: "#f97316",
                     width: "0%",
                     animationDelay: `${i * 0.5}s`,
                     borderRadius: 1,
@@ -294,7 +294,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
                   style={{
                     fontFamily: "var(--font-mono, monospace)",
                     fontSize: 12,
-                    color: "#7c3aed",
+                    color: "#f97316",
                     letterSpacing: "0.02em",
                   }}
                 >
@@ -322,7 +322,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
                   display: "inline-block",
                   width: 7,
                   height: 14,
-                  background: "#7c3aed",
+                  background: "#f97316",
                   borderRadius: 1,
                   verticalAlign: "middle",
                   marginTop: 1,
