@@ -114,7 +114,9 @@ function extractBrandVariations(html: string, domain: string): string[] {
   raw.add(domainRoot.replace(/-/g, ""));
   raw.add(domainRoot.replace(/-/g, " "));
 
-  return [...raw].filter((v) => v && v.length >= 3);
+  const genericWords = new Set(["home", "index", "welcome", "untitled", "page", "website", "site"]);
+
+  return [...raw].filter((v) => v && v.length >= 3 && !genericWords.has(v.toLowerCase()));
 }
 
 interface WebsiteData {
