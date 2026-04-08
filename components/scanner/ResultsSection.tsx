@@ -25,9 +25,9 @@ const CATEGORIES = [
     label: "Informational",
     description: "Buyer learning about the problem",
     badgeStyle: {
-      border: "1px solid #1d3a6e",
-      color: "#3b82f6",
-      background: "#0d1f3c",
+      border: "1px solid #bfdbfe",
+      color: "#2563eb",
+      background: "#eff6ff",
     },
   },
   {
@@ -35,9 +35,9 @@ const CATEGORIES = [
     label: "Discovery",
     description: "Buyer looking for vendors",
     badgeStyle: {
-      border: "1px solid #7c2d12",
-      color: "#f97316",
-      background: "#1c0a00",
+      border: "1px solid #e9d5ff",
+      color: "#7c3aed",
+      background: "#faf5ff",
     },
   },
   {
@@ -45,9 +45,9 @@ const CATEGORIES = [
     label: "Commercial",
     description: "Buyer comparing options",
     badgeStyle: {
-      border: "1px solid #3a2d00",
-      color: "#f59e0b",
-      background: "#1f1800",
+      border: "1px solid #fed7aa",
+      color: "#f97316",
+      background: "#fff7ed",
     },
   },
   {
@@ -55,9 +55,9 @@ const CATEGORIES = [
     label: "Transactional",
     description: "Buyer ready to purchase",
     badgeStyle: {
-      border: "1px solid #0d3a1f",
-      color: "#22c55e",
-      background: "#0d2018",
+      border: "1px solid #bbf7d0",
+      color: "#16a34a",
+      background: "#f0fdf4",
     },
   },
 ];
@@ -76,9 +76,9 @@ const RECOMMENDATIONS: Record<Category, string> = {
 // ── Utils ─────────────────────────────────────────────────────────────────────
 
 function scoreColor(score: number) {
-  if (score > 66) return "#22c55e";
-  if (score >= 33) return "#f59e0b";
-  return "#ef4444";
+  if (score > 66) return "#16a34a";
+  if (score >= 33) return "#f97316";
+  return "#dc2626";
 }
 
 function scoreMessage(score: number) {
@@ -134,22 +134,22 @@ function EngineCard({
   return (
     <div
       style={{
-        background: "#0c0c0c",
-        border: "1px solid #1f1f1f",
-        borderRadius: 8,
+        background: "#f7f7f5",
+        border: "1px solid #e5e5e0",
+        borderRadius: 6,
         padding: "20px 16px",
         textAlign: "center",
         transition: "border-color 150ms ease",
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#333333")}
-      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#1f1f1f")}
+      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#d0d0c8")}
+      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e5e5e0")}
     >
       <p
         style={{
-          fontFamily: "var(--font-heading, system-ui)",
+          fontFamily: "var(--font-sans, system-ui)",
           fontSize: 13,
           fontWeight: 500,
-          color: "#888888",
+          color: "#555550",
           marginBottom: 12,
         }}
       >
@@ -167,16 +167,31 @@ function EngineCard({
             }}
           >
             {display}
-            <span style={{ fontSize: 14, fontWeight: 400, color: "#444444" }}>%</span>
+            <span style={{ fontSize: 14, fontWeight: 400, color: "#999990" }}>%</span>
           </p>
-          <p style={{ marginTop: 6, fontSize: 11, color: "#444444", fontFamily: "var(--font-mono, monospace)" }}>
+          <p
+            style={{
+              marginTop: 6,
+              fontSize: 11,
+              color: "#999990",
+              fontFamily: "var(--font-mono, monospace)",
+              letterSpacing: "0.05em",
+              textTransform: "uppercase",
+            }}
+          >
             visibility
           </p>
         </>
       ) : (
         <>
-          <p style={{ fontSize: 20, opacity: 0.3, marginBottom: 4 }}>🔒</p>
-          <p style={{ fontSize: 11, color: "#444444", fontFamily: "var(--font-mono, monospace)" }}>
+          <p style={{ fontSize: 20, opacity: 0.4, marginBottom: 4 }}>🔒</p>
+          <p
+            style={{
+              fontSize: 11,
+              color: "#999990",
+              fontFamily: "var(--font-mono, monospace)",
+            }}
+          >
             Add API key
           </p>
         </>
@@ -230,20 +245,25 @@ export function ResultsSection({
     <section
       ref={sectionRef}
       className="animate-fade-in-up"
-      style={{ background: "#000000", padding: "32px 16px 80px" }}
+      style={{
+        background: "#ffffff",
+        borderTop: "1px solid #e5e5e0",
+        padding: "48px 16px 80px",
+      }}
     >
       {/* Toast */}
       {showToast && (
         <div
           className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-fade-in-up"
           style={{
-            border: "1px solid rgba(249,115,22,0.4)",
-            background: "rgba(249,115,22,0.12)",
+            border: "1px solid #fed7aa",
+            background: "#fff7ed",
             color: "#f97316",
-            borderRadius: 8,
+            borderRadius: 6,
             padding: "12px 20px",
             fontSize: 13,
             fontFamily: "var(--font-mono, monospace)",
+            whiteSpace: "nowrap",
           }}
         >
           Report unlocked! We&apos;ll send you weekly AI updates for this domain.
@@ -253,13 +273,21 @@ export function ResultsSection({
       <div style={{ maxWidth: 896, margin: "0 auto" }}>
 
         {/* Score circle */}
-        <div style={{ padding: "40px 0 32px", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+        <div
+          style={{
+            padding: "48px 0 32px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
           <ScoreCircle score={scanData.overallScore} active={true} />
           <p
             style={{
               fontFamily: "var(--font-mono, monospace)",
-              fontSize: 11,
-              color: "#444444",
+              fontSize: 10,
+              color: "#999990",
               letterSpacing: "0.14em",
               textTransform: "uppercase",
             }}
@@ -268,7 +296,7 @@ export function ResultsSection({
           </p>
           <p
             style={{
-              fontFamily: "var(--font-heading, system-ui)",
+              fontFamily: "var(--font-sans, system-ui)",
               fontSize: 16,
               fontWeight: 600,
               color: scoreColor(scanData.overallScore),
@@ -282,9 +310,9 @@ export function ResultsSection({
         {scanData.businessProfile && (
           <div
             style={{
-              background: "#0c0c0c",
-              border: "1px solid #1f1f1f",
-              borderRadius: 8,
+              background: "#f7f7f5",
+              border: "1px solid #e5e5e0",
+              borderRadius: 6,
               padding: 24,
               marginBottom: 24,
             }}
@@ -293,7 +321,7 @@ export function ResultsSection({
               style={{
                 fontFamily: "var(--font-mono, monospace)",
                 fontSize: 10,
-                color: "#444444",
+                color: "#999990",
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
                 marginBottom: 16,
@@ -318,8 +346,8 @@ export function ResultsSection({
                 <div
                   key={item.label}
                   style={{
-                    background: "#141414",
-                    border: "1px solid #1f1f1f",
+                    background: "#ffffff",
+                    border: "1px solid #e5e5e0",
                     borderRadius: 6,
                     padding: "12px 16px",
                   }}
@@ -328,7 +356,7 @@ export function ResultsSection({
                     style={{
                       fontFamily: "var(--font-mono, monospace)",
                       fontSize: 10,
-                      color: "#444444",
+                      color: "#999990",
                       letterSpacing: "0.1em",
                       textTransform: "uppercase",
                       marginBottom: 6,
@@ -338,9 +366,9 @@ export function ResultsSection({
                   </p>
                   <p
                     style={{
-                      fontFamily: "var(--font-heading, system-ui)",
+                      fontFamily: "var(--font-sans, system-ui)",
                       fontSize: 13,
-                      color: "#ffffff",
+                      color: "#0a0a0a",
                       lineHeight: 1.5,
                     }}
                   >
@@ -362,23 +390,37 @@ export function ResultsSection({
         {/* Results table */}
         <div
           style={{
-            border: "1px solid #1f1f1f",
-            borderRadius: 8,
+            border: "1px solid #e5e5e0",
+            borderRadius: 6,
             overflow: "hidden",
           }}
         >
           <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", minWidth: 480, borderCollapse: "collapse", fontSize: 13 }}>
+            <table
+              style={{
+                width: "100%",
+                minWidth: 480,
+                borderCollapse: "collapse",
+                fontSize: 13,
+              }}
+            >
               <thead>
-                <tr style={{ borderBottom: "1px solid #1f1f1f", background: "#0c0c0c" }}>
+                <tr
+                  style={{
+                    borderBottom: "1px solid #e5e5e0",
+                    background: "#f7f7f5",
+                  }}
+                >
                   <th
                     style={{
                       padding: "12px 20px",
                       textAlign: "left",
-                      fontFamily: "var(--font-heading, system-ui)",
-                      fontWeight: 600,
-                      fontSize: 12,
-                      color: "#888888",
+                      fontFamily: "var(--font-mono, monospace)",
+                      fontWeight: 500,
+                      fontSize: 10,
+                      color: "#999990",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
                     }}
                   >
                     Buyer Prompt
@@ -390,10 +432,12 @@ export function ResultsSection({
                       style={{
                         padding: "12px 16px",
                         textAlign: "center",
-                        fontFamily: "var(--font-heading, system-ui)",
-                        fontWeight: 600,
-                        fontSize: 12,
-                        color: "#888888",
+                        fontFamily: "var(--font-mono, monospace)",
+                        fontWeight: 500,
+                        fontSize: 10,
+                        color: "#999990",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
                         whiteSpace: "nowrap",
                       }}
                     >
@@ -417,7 +461,11 @@ export function ResultsSection({
                     const cs = scanData.categoryScores?.[catMeta.key] ?? { appeared: 0, total: 0 };
                     const catPct = pct(cs);
                     const appearedCount = catResults.filter(
-                      (r) => r.gemini?.appeared || r.claude?.appeared || r.chatgpt?.appeared || r.perplexity?.appeared
+                      (r) =>
+                        r.gemini?.appeared ||
+                        r.claude?.appeared ||
+                        r.chatgpt?.appeared ||
+                        r.perplexity?.appeared
                     ).length;
 
                     if (emailCaptured || rowCount < FREE_ROWS) {
@@ -425,7 +473,10 @@ export function ResultsSection({
                         <tr key={`h-${catMeta.key}`}>
                           <td
                             colSpan={ENGINES.length + 1}
-                            style={{ borderBottom: "1px solid #1f1f1f", background: "#000000" }}
+                            style={{
+                              borderBottom: "1px solid #e5e5e0",
+                              background: "#ffffff",
+                            }}
                           >
                             <div
                               style={{
@@ -445,7 +496,7 @@ export function ResultsSection({
                                     padding: "2px 8px",
                                     fontSize: 10,
                                     fontFamily: "var(--font-mono, monospace)",
-                                    fontWeight: 700,
+                                    fontWeight: 600,
                                     letterSpacing: "0.08em",
                                     textTransform: "uppercase",
                                   }}
@@ -454,12 +505,22 @@ export function ResultsSection({
                                 </span>
                                 <span
                                   className="hidden sm:inline"
-                                  style={{ fontSize: 12, color: "#444444", fontFamily: "var(--font-mono, monospace)" }}
+                                  style={{
+                                    fontSize: 12,
+                                    color: "#999990",
+                                    fontFamily: "var(--font-sans, system-ui)",
+                                  }}
                                 >
                                   {catMeta.description}
                                 </span>
                               </div>
-                              <span style={{ fontSize: 12, color: "#444444", fontFamily: "var(--font-mono, monospace)" }}>
+                              <span
+                                style={{
+                                  fontSize: 12,
+                                  color: "#999990",
+                                  fontFamily: "var(--font-mono, monospace)",
+                                }}
+                              >
                                 {appearedCount}/{catResults.length} appeared{" "}
                                 <span style={{ color: scoreColor(catPct), fontWeight: 600 }}>
                                   ({catPct}%)
@@ -476,21 +537,29 @@ export function ResultsSection({
                       const visible = emailCaptured || rowCount < FREE_ROWS;
 
                       if (visible) {
-                        const rowBg = rowCount % 2 === 0 ? "#000000" : "#0c0c0c";
+                        const rowBg = rowCount % 2 === 0 ? "#ffffff" : "#f7f7f5";
                         elements.push(
                           <tr
                             key={`r-${catMeta.key}-${i}`}
-                            style={{ borderBottom: "1px solid #0f0f0f", background: rowBg, transition: "background 150ms ease" }}
-                            onMouseEnter={(e) => (e.currentTarget.style.background = "#141414")}
-                            onMouseLeave={(e) => (e.currentTarget.style.background = rowBg)}
+                            style={{
+                              borderBottom: "1px solid #e5e5e0",
+                              background: rowBg,
+                              transition: "background 150ms ease",
+                            }}
+                            onMouseEnter={(e) =>
+                              (e.currentTarget.style.background = "#f0f0ed")
+                            }
+                            onMouseLeave={(e) =>
+                              (e.currentTarget.style.background = rowBg)
+                            }
                           >
                             <td
                               style={{
                                 padding: "16px 20px",
                                 fontSize: 13,
-                                color: "#888888",
+                                color: "#555550",
                                 lineHeight: 1.55,
-                                fontFamily: "var(--font-body, system-ui)",
+                                fontFamily: "var(--font-sans, system-ui)",
                               }}
                             >
                               {row.prompt}
@@ -498,16 +567,23 @@ export function ResultsSection({
                             {ENGINES.map(({ key, label }) => {
                               const eng = scanData.engines?.[key];
                               const res = row[
-                                key as keyof Pick<PromptResult, "gemini" | "claude" | "chatgpt" | "perplexity">
+                                key as keyof Pick<
+                                  PromptResult,
+                                  "gemini" | "claude" | "chatgpt" | "perplexity"
+                                >
                               ] as EngineResult | undefined;
                               return (
                                 <td
                                   key={key}
                                   className="hidden sm:table-cell"
-                                  style={{ padding: "16px", textAlign: "center", verticalAlign: "middle" }}
+                                  style={{
+                                    padding: "16px",
+                                    textAlign: "center",
+                                    verticalAlign: "middle",
+                                  }}
                                 >
                                   {!eng?.available ? (
-                                    <span style={{ color: "#333333", fontSize: 14 }}>🔒</span>
+                                    <span style={{ color: "#d0d0c8", fontSize: 14 }}>🔒</span>
                                   ) : res?.appeared ? (
                                     <span
                                       title={res.snippet || "Appeared"}
@@ -516,7 +592,7 @@ export function ResultsSection({
                                         width: 8,
                                         height: 8,
                                         borderRadius: "50%",
-                                        background: "#22c55e",
+                                        background: "#16a34a",
                                       }}
                                     />
                                   ) : (
@@ -526,17 +602,16 @@ export function ResultsSection({
                                         width: 8,
                                         height: 8,
                                         borderRadius: "50%",
-                                        background: "#ef4444",
-                                        opacity: 0.6,
+                                        background: "#dc2626",
+                                        opacity: 0.5,
                                       }}
                                     />
                                   )}
-                                  {/* Mobile label */}
                                   <span
                                     className="sm:hidden block"
                                     style={{
                                       fontSize: 9,
-                                      color: "#444444",
+                                      color: "#999990",
                                       fontFamily: "var(--font-mono, monospace)",
                                       textTransform: "uppercase",
                                       marginTop: 4,
@@ -562,10 +637,9 @@ export function ResultsSection({
                                 style={{
                                   margin: "20px",
                                   borderRadius: 8,
-                                  padding: "40px 32px",
+                                  padding: "48px 32px",
                                   textAlign: "center",
-                                  background: "#000000",
-                                  boxShadow: "0 0 0 1px #f97316, 0 0 30px rgba(249,115,22,0.1)",
+                                  background: "#0a0a0a",
                                 }}
                               >
                                 {/* Lock icon */}
@@ -582,7 +656,16 @@ export function ResultsSection({
                                     margin: "0 auto 16px",
                                   }}
                                 >
-                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#f97316"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
                                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                                   </svg>
@@ -602,7 +685,7 @@ export function ResultsSection({
                                 </p>
                                 <h3
                                   style={{
-                                    fontFamily: "var(--font-heading, system-ui)",
+                                    fontFamily: "var(--font-sans, system-ui)",
                                     fontWeight: 700,
                                     fontSize: 20,
                                     color: "#ffffff",
@@ -613,7 +696,8 @@ export function ResultsSection({
                                 </h3>
                                 <p
                                   style={{
-                                    fontSize: 13,
+                                    fontFamily: "var(--font-sans, system-ui)",
+                                    fontSize: 14,
                                     color: "#888888",
                                     marginBottom: 28,
                                     maxWidth: 400,
@@ -641,21 +725,28 @@ export function ResultsSection({
                                       type="email"
                                       required
                                       value={emailInput}
-                                      onChange={(e) => { onEmailChange(e.target.value); if (emailError) setEmailError(""); }}
+                                      onChange={(e) => {
+                                        onEmailChange(e.target.value);
+                                        if (emailError) setEmailError("");
+                                      }}
                                       onFocus={() => onEmailFocus(true)}
                                       onBlur={() => onEmailFocus(false)}
                                       placeholder=" "
                                       style={{
                                         width: "100%",
-                                        background: "#0c0c0c",
-                                        border: `1px solid ${emailFocused ? "#f97316" : "#1f1f1f"}`,
-                                        borderRadius: 8,
-                                        padding: emailInput || emailFocused ? "22px 16px 8px" : "14px 16px",
+                                        background: "#1a1a1a",
+                                        border: `1px solid ${emailFocused ? "#f97316" : "#2a2a2a"}`,
+                                        borderRadius: 6,
+                                        padding:
+                                          emailInput || emailFocused
+                                            ? "22px 16px 8px"
+                                            : "14px 16px",
                                         fontSize: 14,
                                         color: "#ffffff",
                                         outline: "none",
-                                        fontFamily: "var(--font-body, system-ui)",
-                                        transition: "border-color 150ms ease, padding 150ms ease",
+                                        fontFamily: "var(--font-sans, system-ui)",
+                                        transition:
+                                          "border-color 150ms ease, padding 150ms ease",
                                         boxSizing: "border-box",
                                       }}
                                     />
@@ -663,20 +754,32 @@ export function ResultsSection({
                                       style={{
                                         position: "absolute",
                                         left: 16,
-                                        top: emailInput || emailFocused ? 7 : "50%",
-                                        transform: emailInput || emailFocused ? "none" : "translateY(-50%)",
-                                        fontSize: emailInput || emailFocused ? 10 : 14,
-                                        color: emailFocused ? "#f97316" : "#444444",
+                                        top:
+                                          emailInput || emailFocused ? 7 : "50%",
+                                        transform:
+                                          emailInput || emailFocused
+                                            ? "none"
+                                            : "translateY(-50%)",
+                                        fontSize:
+                                          emailInput || emailFocused ? 10 : 14,
+                                        color: emailFocused ? "#f97316" : "#666660",
                                         pointerEvents: "none",
                                         transition: "all 150ms ease",
-                                        fontFamily: "var(--font-body, system-ui)",
+                                        fontFamily: "var(--font-sans, system-ui)",
                                       }}
                                     >
                                       Work email
                                     </label>
                                   </div>
                                   {emailError && (
-                                    <p style={{ fontSize: 12, color: "#ef4444", textAlign: "left", marginBottom: 8 }}>
+                                    <p
+                                      style={{
+                                        fontSize: 12,
+                                        color: "#dc2626",
+                                        textAlign: "left",
+                                        marginBottom: 8,
+                                      }}
+                                    >
                                       {emailError}
                                     </p>
                                   )}
@@ -688,17 +791,22 @@ export function ResultsSection({
                                       background: "#f97316",
                                       color: "#ffffff",
                                       border: "none",
-                                      borderRadius: 8,
+                                      borderRadius: 6,
                                       padding: "13px",
                                       fontSize: 14,
                                       fontWeight: 600,
-                                      fontFamily: "var(--font-heading, system-ui)",
+                                      fontFamily: "var(--font-sans, system-ui)",
                                       cursor: emailSubmitting ? "not-allowed" : "pointer",
                                       transition: "background 150ms ease",
                                       opacity: emailSubmitting ? 0.6 : 1,
                                     }}
-                                    onMouseEnter={(e) => { if (!emailSubmitting) e.currentTarget.style.background = "#ea6c00"; }}
-                                    onMouseLeave={(e) => (e.currentTarget.style.background = "#f97316")}
+                                    onMouseEnter={(e) => {
+                                      if (!emailSubmitting)
+                                        e.currentTarget.style.background = "#ea6c00";
+                                    }}
+                                    onMouseLeave={(e) =>
+                                      (e.currentTarget.style.background = "#f97316")
+                                    }
                                   >
                                     {emailSubmitting ? "Unlocking..." : "Get My Full Report →"}
                                   </button>
@@ -733,9 +841,9 @@ export function ResultsSection({
           <div
             style={{
               marginTop: 24,
-              background: "#0c0c0c",
-              border: "1px solid #1f1f1f",
-              borderRadius: 8,
+              background: "#f7f7f5",
+              border: "1px solid #e5e5e0",
+              borderRadius: 6,
               padding: 24,
             }}
           >
@@ -743,7 +851,7 @@ export function ResultsSection({
               style={{
                 fontFamily: "var(--font-mono, monospace)",
                 fontSize: 10,
-                color: "#444444",
+                color: "#999990",
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
                 marginBottom: 20,
@@ -754,52 +862,112 @@ export function ResultsSection({
             <div className="grid gap-3 sm:grid-cols-3">
               <div
                 style={{
-                  background: "#141414",
-                  border: "1px solid rgba(34,197,94,0.2)",
+                  background: "#ffffff",
+                  border: "1px solid #e5e5e0",
                   borderRadius: 6,
                   padding: 16,
                 }}
               >
-                <p style={{ fontFamily: "var(--font-mono, monospace)", fontSize: 10, color: "#444444", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                <p
+                  style={{
+                    fontFamily: "var(--font-mono, monospace)",
+                    fontSize: 10,
+                    color: "#999990",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.1em",
+                    marginBottom: 6,
+                  }}
+                >
                   Strongest intent
                 </p>
-                <p style={{ fontFamily: "var(--font-heading, system-ui)", fontWeight: 600, color: "#22c55e", marginBottom: 4 }}>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans, system-ui)",
+                    fontWeight: 600,
+                    color: "#16a34a",
+                    marginBottom: 4,
+                  }}
+                >
                   {insights.strongest.label}
                 </p>
-                <p style={{ fontSize: 12, color: "#888888", fontFamily: "var(--font-mono, monospace)" }}>
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: "#999990",
+                    fontFamily: "var(--font-mono, monospace)",
+                  }}
+                >
                   {insights.strongest.p}% visibility
                 </p>
               </div>
               <div
                 style={{
-                  background: "#141414",
-                  border: "1px solid rgba(239,68,68,0.2)",
+                  background: "#ffffff",
+                  border: "1px solid #e5e5e0",
                   borderRadius: 6,
                   padding: 16,
                 }}
               >
-                <p style={{ fontFamily: "var(--font-mono, monospace)", fontSize: 10, color: "#444444", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                <p
+                  style={{
+                    fontFamily: "var(--font-mono, monospace)",
+                    fontSize: 10,
+                    color: "#999990",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.1em",
+                    marginBottom: 6,
+                  }}
+                >
                   Biggest gap
                 </p>
-                <p style={{ fontFamily: "var(--font-heading, system-ui)", fontWeight: 600, color: "#ef4444", marginBottom: 4 }}>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans, system-ui)",
+                    fontWeight: 600,
+                    color: "#dc2626",
+                    marginBottom: 4,
+                  }}
+                >
                   {insights.weakest.label}
                 </p>
-                <p style={{ fontSize: 12, color: "#888888", fontFamily: "var(--font-mono, monospace)" }}>
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: "#999990",
+                    fontFamily: "var(--font-mono, monospace)",
+                  }}
+                >
                   {insights.weakest.p}% — buyers can&apos;t find you
                 </p>
               </div>
               <div
                 style={{
-                  background: "#141414",
-                  border: "1px solid #1f1f1f",
+                  background: "#ffffff",
+                  border: "1px solid #e5e5e0",
                   borderRadius: 6,
                   padding: 16,
                 }}
               >
-                <p style={{ fontFamily: "var(--font-mono, monospace)", fontSize: 10, color: "#444444", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                <p
+                  style={{
+                    fontFamily: "var(--font-mono, monospace)",
+                    fontSize: 10,
+                    color: "#999990",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.1em",
+                    marginBottom: 6,
+                  }}
+                >
                   Recommendation
                 </p>
-                <p style={{ fontSize: 12, color: "#888888", lineHeight: 1.6 }}>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans, system-ui)",
+                    fontSize: 13,
+                    color: "#555550",
+                    lineHeight: 1.6,
+                  }}
+                >
                   {RECOMMENDATIONS[insights.weakest.key]}
                 </p>
               </div>
@@ -811,19 +979,19 @@ export function ResultsSection({
         <div
           style={{
             marginTop: 24,
-            background: "rgba(249,115,22,0.08)",
-            border: "1px solid rgba(249,115,22,0.3)",
-            borderRadius: 8,
+            background: "#f7f7f5",
+            border: "1px solid #e5e5e0",
+            borderRadius: 6,
             padding: "40px 32px",
             textAlign: "center",
           }}
         >
           <h3
             style={{
-              fontFamily: "var(--font-heading, system-ui)",
+              fontFamily: "var(--font-sans, system-ui)",
               fontWeight: 700,
               fontSize: 20,
-              color: "#ffffff",
+              color: "#0a0a0a",
               marginBottom: 8,
             }}
           >
@@ -831,26 +999,27 @@ export function ResultsSection({
           </h3>
           <p
             style={{
-              fontSize: 13,
-              color: "#888888",
+              fontFamily: "var(--font-sans, system-ui)",
+              fontSize: 14,
+              color: "#555550",
               maxWidth: 480,
               margin: "0 auto 28px",
               lineHeight: 1.65,
             }}
           >
-            Get weekly AI visibility reports, track competitors, and know when your brand disappears
-            from AI search — before it costs you pipeline.
+            Get weekly AI visibility reports, track competitors, and know when your brand
+            disappears from AI search — before it costs you pipeline.
           </p>
           <button
             style={{
               background: "#f97316",
               color: "#ffffff",
               border: "none",
-              borderRadius: 8,
+              borderRadius: 6,
               padding: "13px 32px",
               fontSize: 14,
               fontWeight: 600,
-              fontFamily: "var(--font-heading, system-ui)",
+              fontFamily: "var(--font-sans, system-ui)",
               cursor: "pointer",
               transition: "background 150ms ease",
             }}
@@ -863,7 +1032,7 @@ export function ResultsSection({
             style={{
               marginTop: 12,
               fontSize: 11,
-              color: "#444444",
+              color: "#999990",
               fontFamily: "var(--font-mono, monospace)",
             }}
           >

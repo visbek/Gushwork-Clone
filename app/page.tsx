@@ -10,40 +10,11 @@ import {
   type EngineState,
 } from "@/components/scanner/types";
 
-// ── Theme toggle icons ───────────────────────────────────────────────────────
-
-function SunIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="5" />
-      <line x1="12" y1="1" x2="12" y2="3" />
-      <line x1="12" y1="21" x2="12" y2="23" />
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-      <line x1="1" y1="12" x2="3" y2="12" />
-      <line x1="21" y1="12" x2="23" y2="12" />
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-    </svg>
-  );
-}
-
 export default function Home() {
   const [domain, setDomain] = useState("");
   const [status, setStatus] = useState<ScanStatus>("idle");
   const [rateLimited, setRateLimited] = useState(false);
   const [scanData, setScanData] = useState<ScanData | null>(null);
-
-  // Theme
-  const [isDark, setIsDark] = useState(true);
 
   // Email wall state
   const [emailCaptured, setEmailCaptured] = useState(false);
@@ -62,22 +33,6 @@ export default function Home() {
   const [scanTextIdx, setScanTextIdx] = useState(0);
 
   const resultsRef = useRef<HTMLDivElement | null>(null);
-
-  // ── Theme init ───────────────────────────────────────────────────────────────
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    const dark = saved ? saved === "dark" : true;
-    setIsDark(dark);
-    document.documentElement.classList.toggle("dark", dark);
-  }, []);
-
-  function toggleTheme() {
-    const newDark = !isDark;
-    setIsDark(newDark);
-    document.documentElement.classList.toggle("dark", newDark);
-    localStorage.setItem("theme", newDark ? "dark" : "light");
-  }
 
   // ── localStorage ────────────────────────────────────────────────────────────
 
@@ -208,66 +163,51 @@ export default function Home() {
 
   return (
     <main
-      className="min-h-screen overflow-x-hidden transition-colors duration-300"
-      style={{
-        background: "var(--sp-bg)",
-        color: "var(--sp-text)",
-      }}
+      className="min-h-screen overflow-x-hidden"
+      style={{ background: "#ffffff", color: "#0a0a0a" }}
     >
       {/* Nav */}
       <nav
-        className="sticky top-0 z-40 border-b px-6 py-4"
+        className="sticky top-0 z-40 px-6 py-4"
         style={{
-          borderColor: "#1f1f1f",
-          background: "#000000",
+          background: "#ffffff",
+          borderBottom: "1px solid #e5e5e0",
         }}
       >
         <div className="mx-auto max-w-6xl flex items-center justify-between">
           {/* Logo */}
           <span
             style={{
-              fontFamily: "var(--font-heading, system-ui)",
-              fontWeight: 600,
+              fontFamily: "var(--font-sans, system-ui)",
+              fontWeight: 700,
               fontSize: 16,
-              color: "#ffffff",
-              letterSpacing: "-0.01em",
+              color: "#0a0a0a",
+              letterSpacing: "-0.02em",
             }}
           >
             sparrwo
           </span>
 
-          {/* Right side */}
-          <div className="flex items-center gap-3">
-            {/* Theme toggle */}
-            <button
-              onClick={toggleTheme}
-              className="w-8 h-8 flex items-center justify-center rounded-sm"
-              style={{
-                color: "#444444",
-                transition: "color 150ms ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#888888")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#444444")}
-              aria-label="Toggle theme"
-            >
-              {isDark ? <SunIcon /> : <MoonIcon />}
-            </button>
-
-            {/* Try Free */}
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="hidden sm:block px-4 py-1.5 text-xs font-bold rounded-lg"
-              style={{
-                background: "#f97316",
-                color: "#ffffff",
-                transition: "background 150ms ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#ea6c00")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "#f97316")}
-            >
-              Try Free
-            </button>
-          </div>
+          {/* Try Free */}
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            style={{
+              background: "#0a0a0a",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: 6,
+              padding: "8px 16px",
+              fontSize: 13,
+              fontWeight: 600,
+              fontFamily: "var(--font-sans, system-ui)",
+              cursor: "pointer",
+              transition: "background 150ms ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#f97316")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#0a0a0a")}
+          >
+            Try Free
+          </button>
         </div>
       </nav>
 
@@ -281,22 +221,45 @@ export default function Home() {
 
       {/* Rate limit banner */}
       {rateLimited && (
-        <div className="px-6 py-6 flex justify-center">
+        <div style={{ padding: "24px", display: "flex", justifyContent: "center" }}>
           <div
-            className="rounded-2xl border px-6 py-5 max-w-lg w-full text-center"
             style={{
-              background: "var(--sp-card)",
-              borderColor: "var(--sp-accent-border)",
+              background: "#f7f7f5",
+              border: "1px solid #e5e5e0",
+              borderRadius: 8,
+              padding: "20px 24px",
+              maxWidth: 480,
+              width: "100%",
+              textAlign: "center",
             }}
           >
-            <p className="text-sm mb-4" style={{ color: "var(--sp-text-2)" }}>
+            <p
+              style={{
+                fontFamily: "var(--font-sans, system-ui)",
+                fontSize: 14,
+                color: "#555550",
+                marginBottom: 16,
+              }}
+            >
               You&apos;ve used your 3 free scans today.{" "}
-              <span style={{ color: "var(--sp-text)" }}>Upgrade for unlimited scans.</span>
+              <span style={{ color: "#0a0a0a", fontWeight: 600 }}>Upgrade for unlimited scans.</span>
             </p>
             <a
               href="/pricing"
-              className="inline-block rounded-sm px-6 py-2.5 text-sm font-bold transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: "var(--sp-accent)", color: "#fff" }}
+              style={{
+                display: "inline-block",
+                background: "#f97316",
+                color: "#ffffff",
+                borderRadius: 6,
+                padding: "10px 24px",
+                fontSize: 14,
+                fontWeight: 600,
+                fontFamily: "var(--font-sans, system-ui)",
+                textDecoration: "none",
+                transition: "background 150ms ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ea6c00")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#f97316")}
             >
               Upgrade for unlimited scans →
             </a>
@@ -331,49 +294,67 @@ export default function Home() {
 
       {/* Footer */}
       <footer
-        className="border-t px-6 py-8 text-center"
-        style={{ borderColor: "#1f1f1f", background: "#000000" }}
+        style={{
+          background: "#0a0a0a",
+          borderTop: "1px solid #1a1a1a",
+          padding: "40px 24px",
+          textAlign: "center",
+        }}
       >
-        <span
-          suppressHydrationWarning
-          style={{
-            fontFamily: "var(--font-mono, monospace)",
-            fontSize: 12,
-            color: "#444444",
-          }}
-        >
-          sparrwo © 2026
-        </span>
-        <span style={{ color: "#1f1f1f", margin: "0 12px" }}>·</span>
-        <a
-          href="/privacy"
-          style={{
-            fontFamily: "var(--font-mono, monospace)",
-            fontSize: 12,
-            color: "#444444",
-            textDecoration: "none",
-            transition: "color 150ms ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#888888")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#444444")}
-        >
-          Privacy
-        </a>
-        <span style={{ color: "#1f1f1f", margin: "0 12px" }}>·</span>
-        <a
-          href="/terms"
-          style={{
-            fontFamily: "var(--font-mono, monospace)",
-            fontSize: 12,
-            color: "#444444",
-            textDecoration: "none",
-            transition: "color 150ms ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#888888")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#444444")}
-        >
-          Terms
-        </a>
+        <div style={{ marginBottom: 16 }}>
+          <span
+            style={{
+              fontFamily: "var(--font-sans, system-ui)",
+              fontWeight: 700,
+              fontSize: 14,
+              color: "#ffffff",
+            }}
+          >
+            sparrwo
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+          <span
+            suppressHydrationWarning
+            style={{
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: 12,
+              color: "#666660",
+            }}
+          >
+            © 2026
+          </span>
+          <span style={{ color: "#2a2a2a", margin: "0 10px" }}>·</span>
+          <a
+            href="/privacy"
+            style={{
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: 12,
+              color: "#666660",
+              textDecoration: "none",
+              transition: "color 150ms ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#666660")}
+          >
+            Privacy
+          </a>
+          <span style={{ color: "#2a2a2a", margin: "0 10px" }}>·</span>
+          <a
+            href="/terms"
+            style={{
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: 12,
+              color: "#666660",
+              textDecoration: "none",
+              transition: "color 150ms ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#666660")}
+          >
+            Terms
+          </a>
+        </div>
       </footer>
     </main>
   );

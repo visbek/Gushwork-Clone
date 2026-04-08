@@ -47,7 +47,6 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
   const [promptCount, setPromptCount] = useState(0);
   const [visibleLogs, setVisibleLogs] = useState<string[]>([]);
 
-  // Counter: 0 → 24 at ~1 per 1.2s
   useEffect(() => {
     setPromptCount(0);
     let count = 0;
@@ -59,7 +58,6 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
     return () => clearInterval(id);
   }, []);
 
-  // Log feed: one new line every 2.2s, keep last 4
   useEffect(() => {
     setVisibleLogs([]);
     let idx = 0;
@@ -77,7 +75,9 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
   return (
     <section
       style={{
-        background: "#000000",
+        background: "#ffffff",
+        borderTop: "2px solid #f97316",
+        borderBottom: "1px solid #e5e5e0",
         padding: "72px 24px",
       }}
     >
@@ -94,8 +94,8 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
         <div
           style={{
             position: "relative",
-            width: 72,
-            height: 72,
+            width: 64,
+            height: 64,
             marginBottom: 32,
             flexShrink: 0,
           }}
@@ -128,12 +128,12 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
         <p
           style={{
             fontFamily: "var(--font-mono, monospace)",
-            fontSize: 13,
-            color: "#888888",
+            fontSize: 12,
+            color: "#999990",
             letterSpacing: "0.05em",
             marginBottom: 40,
             textAlign: "center",
-            minHeight: 20,
+            minHeight: 18,
           }}
         >
           {SCAN_TEXTS[textIdx % SCAN_TEXTS.length]}
@@ -146,7 +146,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
               fontFamily: "var(--font-mono, monospace)",
               fontSize: 72,
               fontWeight: 700,
-              color: "#ffffff",
+              color: "#0a0a0a",
               lineHeight: 1,
               letterSpacing: "-0.04em",
             }}
@@ -157,7 +157,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
             style={{
               fontFamily: "var(--font-mono, monospace)",
               fontSize: 10,
-              color: "#444444",
+              color: "#999990",
               letterSpacing: "0.2em",
               textTransform: "uppercase",
               marginTop: 10,
@@ -176,7 +176,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
                 display: "flex",
                 alignItems: "center",
                 gap: 16,
-                marginBottom: 24,
+                marginBottom: 20,
               }}
             >
               {/* Engine icon */}
@@ -202,9 +202,10 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
               {/* Engine name */}
               <span
                 style={{
-                  fontFamily: "var(--font-heading, system-ui)",
+                  fontFamily: "var(--font-sans, system-ui)",
                   fontSize: 14,
-                  color: "#ffffff",
+                  color: "#0a0a0a",
+                  fontWeight: 500,
                   width: 90,
                   flexShrink: 0,
                 }}
@@ -217,7 +218,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
                 style={{
                   flex: 1,
                   height: 2,
-                  background: "#1f1f1f",
+                  background: "#e5e5e0",
                   borderRadius: 1,
                   overflow: "hidden",
                   position: "relative",
@@ -243,7 +244,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
                 style={{
                   fontFamily: "var(--font-mono, monospace)",
                   fontSize: 11,
-                  color: "#444444",
+                  color: "#d0d0c8",
                   width: 72,
                   textAlign: "right",
                   flexShrink: 0,
@@ -259,7 +260,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
         <div
           style={{
             width: "100%",
-            borderTop: "1px solid #1f1f1f",
+            borderTop: "1px solid #e5e5e0",
             paddingTop: 24,
             minHeight: 96,
           }}
@@ -267,7 +268,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
           {visibleLogs.map((line, i) => {
             const fromEnd = visibleLogs.length - 1 - i;
             const opacity =
-              fromEnd === 0 ? 1 : fromEnd === 1 ? 0.65 : fromEnd === 2 ? 0.35 : 0.15;
+              fromEnd === 0 ? 1 : fromEnd === 1 ? 0.6 : fromEnd === 2 ? 0.3 : 0.15;
             return (
               <div
                 key={i}
@@ -283,7 +284,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
                   style={{
                     fontFamily: "var(--font-mono, monospace)",
                     fontSize: 12,
-                    color: "#444444",
+                    color: "#e5e5e0",
                     flexShrink: 0,
                     userSelect: "none",
                   }}
@@ -295,7 +296,7 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
                     fontFamily: "var(--font-mono, monospace)",
                     fontSize: 12,
                     color: "#f97316",
-                    letterSpacing: "0.02em",
+                    letterSpacing: "0.01em",
                   }}
                 >
                   {line}
@@ -303,14 +304,13 @@ export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAni
               </div>
             );
           })}
-          {/* blinking cursor on last line */}
           {visibleLogs.length > 0 && (
             <div style={{ display: "flex", gap: 10 }}>
               <span
                 style={{
                   fontFamily: "var(--font-mono, monospace)",
                   fontSize: 12,
-                  color: "#444444",
+                  color: "#e5e5e0",
                   userSelect: "none",
                 }}
               >

@@ -16,12 +16,13 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
   return (
     <section
       style={{
-        background: "#000000",
-        borderBottom: isIdle ? "none" : "1px solid #1f1f1f",
+        background: "#ffffff",
+        borderBottom: isIdle ? "none" : "1px solid #e5e5e0",
       }}
-      className={isIdle
-        ? "flex min-h-[calc(100vh-57px)] flex-col items-center justify-center px-4 sm:px-6 py-16"
-        : "px-4 sm:px-6 py-8 sm:py-10"
+      className={
+        isIdle
+          ? "flex min-h-[calc(100vh-57px)] flex-col items-center justify-center px-4 sm:px-6 py-16"
+          : "px-4 sm:px-6 py-10"
       }
     >
       <div className={`w-full mx-auto ${isIdle ? "max-w-2xl text-center" : "max-w-2xl"}`}>
@@ -35,25 +36,25 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
               style={{
                 fontFamily: "var(--font-mono, monospace)",
                 fontSize: 11,
-                color: "#888888",
+                color: "#999990",
                 letterSpacing: "0.15em",
                 textTransform: "uppercase",
-                marginBottom: 24,
+                marginBottom: 28,
               }}
             >
               AI Search Intelligence
             </p>
 
-            {/* Headline */}
+            {/* Headline — Instrument Serif */}
             <h1
               className="animate-fade-in-up"
               style={{
-                fontFamily: "var(--font-heading, system-ui)",
-                fontWeight: 700,
-                fontSize: "clamp(36px, 6vw, 64px)",
-                lineHeight: 1.1,
-                letterSpacing: "-0.02em",
-                color: "#ffffff",
+                fontFamily: "var(--font-serif, Georgia, serif)",
+                fontWeight: 400,
+                fontSize: "clamp(40px, 6vw, 68px)",
+                lineHeight: 1.05,
+                letterSpacing: "-0.01em",
+                color: "#0a0a0a",
                 marginBottom: 24,
                 animationDelay: "0.08s",
               }}
@@ -65,9 +66,9 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
             <p
               className="animate-fade-in-up"
               style={{
-                fontFamily: "var(--font-heading, system-ui)",
+                fontFamily: "var(--font-sans, system-ui)",
                 fontSize: 18,
-                color: "#888888",
+                color: "#555550",
                 lineHeight: 1.6,
                 marginBottom: 40,
                 animationDelay: "0.16s",
@@ -98,33 +99,33 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
             disabled={isLoading}
             style={{
               flex: 1,
-              background: "#000000",
-              border: "1px solid #1f1f1f",
-              borderRadius: 8,
+              background: "#f7f7f5",
+              border: "1px solid #e5e5e0",
+              borderRadius: 6,
               padding: "11px 16px",
               fontSize: 14,
-              color: "#ffffff",
+              color: "#0a0a0a",
               outline: "none",
               minWidth: 0,
               transition: "border-color 150ms ease",
-              fontFamily: "var(--font-body, system-ui)",
+              fontFamily: "var(--font-sans, system-ui)",
               opacity: isLoading ? 0.5 : 1,
             }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = "#333333")}
-            onBlur={(e) => (e.currentTarget.style.borderColor = "#1f1f1f")}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "#0a0a0a")}
+            onBlur={(e) => (e.currentTarget.style.borderColor = "#e5e5e0")}
           />
           <button
             onClick={() => onScan(domain)}
             disabled={isLoading || !domain.trim()}
             style={{
-              background: isLoading ? "#141414" : "#f97316",
-              color: isLoading ? "#444444" : "#ffffff",
+              background: isLoading ? "#f0f0ed" : "#f97316",
+              color: isLoading ? "#999990" : "#ffffff",
               border: "none",
-              borderRadius: 8,
+              borderRadius: 6,
               padding: "11px 20px",
               fontSize: 14,
               fontWeight: 600,
-              fontFamily: "var(--font-heading, system-ui)",
+              fontFamily: "var(--font-sans, system-ui)",
               cursor: isLoading || !domain.trim() ? "not-allowed" : "pointer",
               whiteSpace: "nowrap",
               display: "flex",
@@ -138,17 +139,18 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
               if (!isLoading && domain.trim()) e.currentTarget.style.background = "#ea6c00";
             }}
             onMouseLeave={(e) => {
-              if (!isLoading) e.currentTarget.style.background = isLoading ? "#141414" : "#f97316";
+              if (!isLoading) e.currentTarget.style.background = "#f97316";
             }}
           >
             {isLoading ? (
               <>
                 <span
                   style={{
-                    width: 14, height: 14,
+                    width: 14,
+                    height: 14,
                     borderRadius: "50%",
-                    border: "2px solid #333",
-                    borderTopColor: "#888",
+                    border: "2px solid #d0d0c8",
+                    borderTopColor: "#f97316",
                     display: "inline-block",
                     animation: "sp-ring-spin 0.8s linear infinite",
                     flexShrink: 0,
@@ -163,7 +165,7 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
         </div>
 
         {status === "error" && (
-          <p style={{ marginTop: 12, fontSize: 13, color: "#ef4444", textAlign: "center" }}>
+          <p style={{ marginTop: 12, fontSize: 13, color: "#dc2626", textAlign: "center" }}>
             Something went wrong. Please try again.
           </p>
         )}
@@ -173,7 +175,7 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
           <div
             className="animate-fade-in-up"
             style={{
-              marginTop: 28,
+              marginTop: 24,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -186,10 +188,10 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
               <span
                 key={pill}
                 style={{
-                  border: "1px solid #1f1f1f",
-                  background: "#0c0c0c",
-                  color: "#888888",
-                  borderRadius: 6,
+                  border: "1px solid #e5e5e0",
+                  background: "#f7f7f5",
+                  color: "#555550",
+                  borderRadius: 4,
                   padding: "4px 12px",
                   fontSize: 12,
                   fontFamily: "var(--font-mono, monospace)",
@@ -204,14 +206,27 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
 
       {/* Marketing sections — idle only */}
       {isIdle && (
-        <div style={{ width: "100%", marginTop: 80 }}>
+        <div style={{ width: "100%", marginTop: 96 }}>
 
           {/* Social proof bar */}
-          <div style={{ borderTop: "1px solid #1f1f1f", borderBottom: "1px solid #1f1f1f", padding: "24px 24px", background: "#000000" }}>
-            <div className="mx-auto max-w-6xl flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
-              <p style={{ fontSize: 13, color: "#444444", fontFamily: "var(--font-mono, monospace)" }}>
+          <div
+            style={{
+              borderTop: "1px solid #e5e5e0",
+              borderBottom: "1px solid #e5e5e0",
+              padding: "20px 24px",
+              background: "#f7f7f5",
+            }}
+          >
+            <div className="mx-auto max-w-6xl flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "#999990",
+                  fontFamily: "var(--font-mono, monospace)",
+                }}
+              >
                 Trusted by{" "}
-                <span style={{ color: "#ffffff" }}>300+ B2B SaaS teams</span>
+                <span style={{ color: "#0a0a0a", fontWeight: 600 }}>300+ B2B SaaS teams</span>
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
                 {["Acme Corp", "Streamline HQ", "LaunchPad"].map((name) => (
@@ -220,7 +235,7 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                     style={{
                       fontSize: 12,
                       fontWeight: 600,
-                      color: "#333333",
+                      color: "#d0d0c8",
                       fontFamily: "var(--font-mono, monospace)",
                       letterSpacing: "0.08em",
                       textTransform: "uppercase",
@@ -237,11 +252,11 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
           <div style={{ padding: "80px 24px", maxWidth: 1152, margin: "0 auto" }}>
             <h2
               style={{
-                fontFamily: "var(--font-heading, system-ui)",
+                fontFamily: "var(--font-sans, system-ui)",
                 fontWeight: 700,
                 fontSize: "clamp(22px, 3vw, 30px)",
                 letterSpacing: "-0.02em",
-                color: "#ffffff",
+                color: "#0a0a0a",
                 textAlign: "center",
                 marginBottom: 48,
               }}
@@ -269,14 +284,14 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                 <div
                   key={card.title}
                   style={{
-                    background: "#0c0c0c",
-                    border: "1px solid #1f1f1f",
-                    borderRadius: 8,
+                    background: "#f7f7f5",
+                    border: "1px solid #e5e5e0",
+                    borderRadius: 6,
                     padding: 24,
                     transition: "border-color 150ms ease",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#333333")}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#1f1f1f")}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#d0d0c8")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e5e5e0")}
                 >
                   <p
                     style={{
@@ -291,17 +306,24 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                   </p>
                   <h3
                     style={{
-                      fontFamily: "var(--font-heading, system-ui)",
+                      fontFamily: "var(--font-sans, system-ui)",
                       fontWeight: 600,
                       fontSize: 15,
-                      color: "#ffffff",
+                      color: "#0a0a0a",
                       lineHeight: 1.4,
-                      marginBottom: 12,
+                      marginBottom: 10,
                     }}
                   >
                     {card.title}
                   </h3>
-                  <p style={{ fontSize: 13, color: "#888888", lineHeight: 1.65 }}>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-sans, system-ui)",
+                      fontSize: 14,
+                      color: "#555550",
+                      lineHeight: 1.65,
+                    }}
+                  >
                     {card.body}
                   </p>
                 </div>
@@ -310,16 +332,22 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
           </div>
 
           {/* How it works */}
-          <div style={{ borderTop: "1px solid #1f1f1f", padding: "80px 24px", background: "#000000" }}>
+          <div
+            style={{
+              borderTop: "1px solid #e5e5e0",
+              padding: "80px 24px",
+              background: "#f7f7f5",
+            }}
+          >
             <div style={{ maxWidth: 896, margin: "0 auto", textAlign: "center" }}>
               <h2
                 style={{
-                  fontFamily: "var(--font-heading, system-ui)",
+                  fontFamily: "var(--font-sans, system-ui)",
                   fontWeight: 700,
                   fontSize: "clamp(22px, 3vw, 30px)",
                   letterSpacing: "-0.02em",
-                  color: "#ffffff",
-                  marginBottom: 12,
+                  color: "#0a0a0a",
+                  marginBottom: 8,
                 }}
               >
                 How it works
@@ -328,7 +356,7 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                 style={{
                   fontFamily: "var(--font-mono, monospace)",
                   fontSize: 12,
-                  color: "#444444",
+                  color: "#999990",
                   marginBottom: 56,
                 }}
               >
@@ -352,14 +380,17 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                     body: "Get a visibility score by buyer intent stage — and exactly where to focus to fix the gaps.",
                   },
                 ].map((item) => (
-                  <div key={item.step} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <div
+                    key={item.step}
+                    style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+                  >
                     <div
                       style={{
                         width: 48,
                         height: 48,
-                        borderRadius: 8,
-                        border: "1px solid rgba(249,115,22,0.3)",
-                        background: "rgba(249,115,22,0.08)",
+                        borderRadius: 6,
+                        border: "1px solid #e5e5e0",
+                        background: "#ffffff",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -374,16 +405,23 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                     </div>
                     <h3
                       style={{
-                        fontFamily: "var(--font-heading, system-ui)",
+                        fontFamily: "var(--font-sans, system-ui)",
                         fontWeight: 600,
                         fontSize: 15,
-                        color: "#ffffff",
+                        color: "#0a0a0a",
                         marginBottom: 10,
                       }}
                     >
                       {item.title}
                     </h3>
-                    <p style={{ fontSize: 13, color: "#888888", lineHeight: 1.65 }}>
+                    <p
+                      style={{
+                        fontFamily: "var(--font-sans, system-ui)",
+                        fontSize: 14,
+                        color: "#555550",
+                        lineHeight: 1.65,
+                      }}
+                    >
                       {item.body}
                     </p>
                   </div>
@@ -393,15 +431,15 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
           </div>
 
           {/* Bottom CTA */}
-          <div style={{ padding: "80px 24px", textAlign: "center" }}>
+          <div style={{ padding: "80px 24px", textAlign: "center", background: "#ffffff" }}>
             <div style={{ maxWidth: 560, margin: "0 auto" }}>
               <h2
                 style={{
-                  fontFamily: "var(--font-heading, system-ui)",
+                  fontFamily: "var(--font-sans, system-ui)",
                   fontWeight: 700,
                   fontSize: "clamp(22px, 3vw, 36px)",
                   letterSpacing: "-0.02em",
-                  color: "#ffffff",
+                  color: "#0a0a0a",
                   marginBottom: 12,
                 }}
               >
@@ -411,7 +449,7 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                 style={{
                   fontFamily: "var(--font-mono, monospace)",
                   fontSize: 12,
-                  color: "#444444",
+                  color: "#999990",
                   marginBottom: 36,
                 }}
               >
@@ -426,19 +464,19 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                   placeholder="yourdomain.com"
                   style={{
                     flex: 1,
-                    background: "#000000",
-                    border: "1px solid #1f1f1f",
-                    borderRadius: 8,
+                    background: "#f7f7f5",
+                    border: "1px solid #e5e5e0",
+                    borderRadius: 6,
                     padding: "11px 16px",
                     fontSize: 14,
-                    color: "#ffffff",
+                    color: "#0a0a0a",
                     outline: "none",
                     transition: "border-color 150ms ease",
-                    fontFamily: "var(--font-body, system-ui)",
+                    fontFamily: "var(--font-sans, system-ui)",
                     minWidth: 0,
                   }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = "#333333")}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = "#1f1f1f")}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "#0a0a0a")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "#e5e5e0")}
                 />
                 <button
                   onClick={() => onScan(domain)}
@@ -447,11 +485,11 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
                     background: "#f97316",
                     color: "#ffffff",
                     border: "none",
-                    borderRadius: 8,
+                    borderRadius: 6,
                     padding: "11px 20px",
                     fontSize: 14,
                     fontWeight: 600,
-                    fontFamily: "var(--font-heading, system-ui)",
+                    fontFamily: "var(--font-sans, system-ui)",
                     cursor: !domain.trim() ? "not-allowed" : "pointer",
                     whiteSpace: "nowrap",
                     opacity: !domain.trim() ? 0.5 : 1,
