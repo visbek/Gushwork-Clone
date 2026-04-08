@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 
-const CIRC = 2 * Math.PI * 52;
+const R = 54;
+const CIRC = 2 * Math.PI * R;
 
 function scoreColor(score: number) {
-  if (score > 66) return "#10b981";
+  if (score > 66) return "#22c55e";
   if (score >= 33) return "#f59e0b";
   return "#ef4444";
 }
@@ -15,10 +16,7 @@ function useCountUp(target: number, active: boolean, duration = 1500) {
   const raf = useRef<number>(0);
 
   useEffect(() => {
-    if (!active) {
-      setValue(0);
-      return;
-    }
+    if (!active) { setValue(0); return; }
     const t0 = performance.now();
     const tick = (now: number) => {
       const p = Math.min((now - t0) / duration, 1);
@@ -32,13 +30,7 @@ function useCountUp(target: number, active: boolean, duration = 1500) {
   return value;
 }
 
-export function ScoreCircle({
-  score,
-  active,
-}: {
-  score: number;
-  active: boolean;
-}) {
+export function ScoreCircle({ score, active }: { score: number; active: boolean }) {
   const display = useCountUp(score, active);
   const [go, setGo] = useState(false);
 
@@ -51,43 +43,49 @@ export function ScoreCircle({
   }, [active]);
 
   const offset = go ? CIRC * (1 - score / 100) : CIRC;
-  const color = scoreColor(score);
+  const arcColor = "#7c3aed";
 
   return (
     <div className="relative" style={{ width: 160, height: 160 }}>
-      <svg
-        width="160"
-        height="160"
-        viewBox="0 0 160 160"
-        style={{ position: "absolute", top: 0, left: 0 }}
-      >
-        <circle cx="80" cy="80" r="52" fill="none" stroke="var(--sp-border-card)" strokeWidth="8" />
+      <svg width="160" height="160" viewBox="0 0 160 160" style={{ position: "absolute", top: 0, left: 0 }}>
+        {/* Track */}
+        <circle cx="80" cy="80" r={R} fill="none" stroke="#1f1f1f" strokeWidth="3" />
+        {/* Progress arc — always violet */}
         <circle
-          cx="80"
-          cy="80"
-          r="52"
+          cx="80" cy="80" r={R}
           fill="none"
-          stroke={color}
-          strokeWidth="8"
+          stroke={arcColor}
+          strokeWidth="3"
           strokeLinecap="round"
           strokeDasharray={CIRC}
           strokeDashoffset={offset}
           transform="rotate(-90 80 80)"
           style={{
-            transition:
-              "stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1), stroke 0.3s ease",
-            filter: `drop-shadow(0 0 10px ${color}55)`,
+            transition: "stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)",
+            filter: "drop-shadow(0 0 8px rgba(124,58,237,0.6))",
           }}
         />
       </svg>
-      <div
-        className="absolute inset-0 flex flex-col items-center justify-center"
-        style={{ fontFamily: "var(--font-geist-sans)" }}
-      >
-        <span className="text-4xl font-extrabold" style={{ color }}>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span
+          style={{
+            fontFamily: "var(--font-mono, monospace)",
+            fontSize: 40,
+            fontWeight: 700,
+            lineHeight: 1,
+            color: scoreColor(score),
+          }}
+        >
           {display}
         </span>
-        <span className="text-xs mt-0.5" style={{ color: "#555" }}>
+        <span
+          style={{
+            fontFamily: "var(--font-mono, monospace)",
+            fontSize: 11,
+            color: "#444444",
+            marginTop: 4,
+          }}
+        >
           / 100
         </span>
       </div>

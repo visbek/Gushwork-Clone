@@ -223,18 +223,21 @@ export default function Home() {
     >
       {/* Nav */}
       <nav
-        className="sticky top-0 z-40 border-b px-6 py-4 backdrop-blur-md transition-colors duration-300"
+        className="sticky top-0 z-40 border-b px-6 py-4"
         style={{
-          borderColor: "var(--sp-nav-border)",
-          background: "var(--sp-nav-bg)",
+          borderColor: "#1f1f1f",
+          background: "#000000",
         }}
       >
         <div className="mx-auto max-w-6xl flex items-center justify-between">
           {/* Logo */}
           <span
-            className="text-lg font-bold tracking-tight lowercase"
             style={{
-              color: "var(--sp-text)",
+              fontFamily: "var(--font-heading, system-ui)",
+              fontWeight: 600,
+              fontSize: 16,
+              color: "#ffffff",
+              letterSpacing: "-0.01em",
             }}
           >
             sparrwo
@@ -245,8 +248,13 @@ export default function Home() {
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}
-              className="w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:bg-black/5"
-              style={{ color: "var(--sp-text-3)" }}
+              className="w-8 h-8 flex items-center justify-center rounded-full"
+              style={{
+                color: "#444444",
+                transition: "color 150ms ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#888888")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#444444")}
               aria-label="Toggle theme"
             >
               {theme === "dark" ? <SunIcon /> : <MoonIcon />}
@@ -255,8 +263,14 @@ export default function Home() {
             {/* Try Free */}
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="hidden sm:block rounded-full px-4 py-1.5 text-xs font-bold transition-all hover:opacity-90 active:scale-[0.97]"
-              style={{ background: "var(--sp-accent)", color: "#fff" }}
+              className="hidden sm:block px-4 py-1.5 text-xs font-bold rounded-lg"
+              style={{
+                background: "#7c3aed",
+                color: "#ffffff",
+                transition: "background 150ms ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#6d28d9")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#7c3aed")}
             >
               Try Free
             </button>
@@ -324,18 +338,47 @@ export default function Home() {
 
       {/* Footer */}
       <footer
-        className="border-t px-6 py-8 text-center text-sm transition-colors duration-300"
-        style={{ borderColor: "var(--sp-border)", color: "var(--sp-text-4)" }}
+        className="border-t px-6 py-8 text-center"
+        style={{ borderColor: "#1f1f1f", background: "#000000" }}
       >
-        <span suppressHydrationWarning>
-          sparrwo © {new Date().getFullYear()}
+        <span
+          suppressHydrationWarning
+          style={{
+            fontFamily: "var(--font-mono, monospace)",
+            fontSize: 12,
+            color: "#444444",
+          }}
+        >
+          sparrwo © 2026
         </span>
-        <span className="mx-3" style={{ color: "var(--sp-border-card)" }}>·</span>
-        <a href="/privacy" className="hover:underline transition-colors" style={{ color: "var(--sp-text-3)" }}>
+        <span style={{ color: "#1f1f1f", margin: "0 12px" }}>·</span>
+        <a
+          href="/privacy"
+          style={{
+            fontFamily: "var(--font-mono, monospace)",
+            fontSize: 12,
+            color: "#444444",
+            textDecoration: "none",
+            transition: "color 150ms ease",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#888888")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#444444")}
+        >
           Privacy
         </a>
-        <span className="mx-3" style={{ color: "var(--sp-border-card)" }}>·</span>
-        <a href="/terms" className="hover:underline transition-colors" style={{ color: "var(--sp-text-3)" }}>
+        <span style={{ color: "#1f1f1f", margin: "0 12px" }}>·</span>
+        <a
+          href="/terms"
+          style={{
+            fontFamily: "var(--font-mono, monospace)",
+            fontSize: 12,
+            color: "#444444",
+            textDecoration: "none",
+            transition: "color 150ms ease",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#888888")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#444444")}
+        >
           Terms
         </a>
       </footer>

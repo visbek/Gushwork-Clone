@@ -10,51 +10,15 @@ const ENGINES = [
 ] as const;
 
 const SCAN_TEXTS = [
-  "Analyzing your brand's AI presence...",
-  "Running buyer intent queries...",
+  "Fetching website data...",
+  "Analyzing ICP profile...",
+  "Querying Gemini 2.5...",
+  "Querying Claude Sonnet...",
+  "Querying ChatGPT-4o...",
+  "Querying Perplexity...",
   "Calculating visibility score...",
-  "Checking AI citations...",
+  "Building your report...",
 ];
-
-const statusLabels: Record<EngineState, string> = {
-  idle: "Queued",
-  scanning: "Scanning",
-  analyzing: "Analyzing",
-  done: "Done ✓",
-};
-
-function PulsingDot({ state }: { state: EngineState }) {
-  if (state === "idle") {
-    return (
-      <span
-        className="inline-block w-2 h-2 rounded-full"
-        style={{ background: "var(--sp-border-card)" }}
-      />
-    );
-  }
-  if (state === "done") {
-    return (
-      <span
-        className="inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold"
-        style={{
-          background: "rgba(16,185,129,0.12)",
-          color: "#10b981",
-          border: "1px solid rgba(16,185,129,0.25)",
-        }}
-      >
-        ✓
-      </span>
-    );
-  }
-  // scanning or analyzing
-  const color = state === "analyzing" ? "#f59e0b" : "var(--sp-accent)";
-  return (
-    <span
-      className="inline-block w-2 h-2 rounded-full animate-sp-pulse"
-      style={{ background: color }}
-    />
-  );
-}
 
 interface ScanningAnimationProps {
   status: ScanStatus;
@@ -62,95 +26,163 @@ interface ScanningAnimationProps {
   textIdx: number;
 }
 
-export function ScanningAnimation({
-  status,
-  engineStates,
-  textIdx,
-}: ScanningAnimationProps) {
+export function ScanningAnimation({ status, engineStates, textIdx }: ScanningAnimationProps) {
+  void status;
+  void engineStates;
+
   return (
     <section
-      className="px-4 sm:px-6 py-10 sm:py-14 transition-colors duration-300"
-      style={{ background: "var(--sp-bg)" }}
+      style={{
+        background: "#000000",
+        padding: "72px 24px",
+      }}
     >
-      <div className="mx-auto max-w-md">
-        {/* Cycling text */}
-        <div className="flex flex-col items-center mb-8">
-          <p
-            className="text-sm font-semibold mb-2"
-            style={{ color: "var(--sp-accent)", minHeight: 20 }}
-          >
-            {SCAN_TEXTS[textIdx % SCAN_TEXTS.length]}
-          </p>
-          <p className="text-xs" style={{ color: "var(--sp-text-4)" }}>
-            {status === "generating"
-              ? "Reading your website..."
-              : "Running 24 prompts across 4 AI engines..."}
-          </p>
-        </div>
-
-        {/* Engine rows */}
+      <div
+        style={{
+          maxWidth: 520,
+          margin: "0 auto",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        {/* Rotating ring + pulsing dot */}
         <div
-          className="rounded-2xl border overflow-hidden"
           style={{
-            background: "var(--sp-card)",
-            borderColor: "var(--sp-border-card)",
+            position: "relative",
+            width: 72,
+            height: 72,
+            marginBottom: 40,
+            flexShrink: 0,
           }}
         >
-          {ENGINES.map((eng, i) => {
-            const state = (engineStates[eng.key] ?? "idle") as EngineState;
-            const stateColor =
-              state === "done"
-                ? "#10b981"
-                : state === "analyzing"
-                ? "#f59e0b"
-                : state === "scanning"
-                ? "var(--sp-accent)"
-                : "var(--sp-text-4)";
+          {/* Dashed spinning ring */}
+          <div
+            className="sp-ring-spin"
+            style={{
+              position: "absolute",
+              inset: 0,
+              border: "2px dashed #7c3aed",
+              borderRadius: "50%",
+            }}
+          />
+          {/* Pulsing violet dot at center */}
+          <div
+            className="animate-sp-pulse"
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              background: "#7c3aed",
+            }}
+          />
+        </div>
 
-            return (
+        {/* Cycling status text */}
+        <p
+          style={{
+            fontFamily: "var(--font-mono, monospace)",
+            fontSize: 13,
+            color: "#888888",
+            letterSpacing: "0.05em",
+            marginBottom: 56,
+            textAlign: "center",
+            minHeight: 20,
+          }}
+        >
+          {SCAN_TEXTS[textIdx % SCAN_TEXTS.length]}
+        </p>
+
+        {/* Engine rows */}
+        <div style={{ width: "100%" }}>
+          {ENGINES.map((eng, i) => (
+            <div
+              key={eng.key}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                marginBottom: 24,
+              }}
+            >
+              {/* Engine icon */}
               <div
-                key={eng.key}
-                className="px-5 py-4 flex items-center gap-4"
                 style={{
-                  borderBottom:
-                    i < ENGINES.length - 1
-                      ? `1px solid var(--sp-border)`
-                      : "none",
+                  width: 28,
+                  height: 28,
+                  borderRadius: 6,
+                  background: eng.color,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#ffffff",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  fontFamily: "var(--font-mono, monospace)",
+                  flexShrink: 0,
                 }}
               >
-                {/* Engine badge */}
-                <div
-                  className="w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center text-white font-bold"
-                  style={{
-                    background: eng.color,
-                    fontSize: 10,
-                    boxShadow: `0 0 10px ${eng.color}30`,
-                  }}
-                >
-                  {eng.abbr}
-                </div>
-
-                {/* Label */}
-                <span
-                  className="text-sm font-medium flex-1"
-                  style={{ color: "var(--sp-text-2)" }}
-                >
-                  {eng.label}
-                </span>
-
-                {/* Status label */}
-                <span
-                  className="text-xs font-medium transition-colors mr-3"
-                  style={{ color: stateColor, minWidth: 64, textAlign: "right" }}
-                >
-                  {statusLabels[state]}
-                </span>
-
-                {/* Pulsing dot */}
-                <PulsingDot state={state} />
+                {eng.abbr}
               </div>
-            );
-          })}
+
+              {/* Engine name */}
+              <span
+                style={{
+                  fontFamily: "var(--font-heading, system-ui)",
+                  fontSize: 14,
+                  color: "#ffffff",
+                  width: 90,
+                  flexShrink: 0,
+                }}
+              >
+                {eng.label}
+              </span>
+
+              {/* Animated scan bar */}
+              <div
+                style={{
+                  flex: 1,
+                  height: 2,
+                  background: "#1f1f1f",
+                  borderRadius: 1,
+                  overflow: "hidden",
+                  position: "relative",
+                }}
+              >
+                <div
+                  className="sp-scan-bar"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    height: "100%",
+                    background: "#7c3aed",
+                    width: "0%",
+                    animationDelay: `${i * 0.5}s`,
+                    borderRadius: 1,
+                  }}
+                />
+              </div>
+
+              {/* Status label */}
+              <span
+                style={{
+                  fontFamily: "var(--font-mono, monospace)",
+                  fontSize: 11,
+                  color: "#444444",
+                  width: 72,
+                  textAlign: "right",
+                  flexShrink: 0,
+                }}
+              >
+                Scanning...
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </section>

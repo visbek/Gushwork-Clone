@@ -9,51 +9,52 @@ interface HeroSectionProps {
   onScan: (domain: string) => void;
 }
 
-export function HeroSection({
-  domain,
-  status,
-  onDomainChange,
-  onScan,
-}: HeroSectionProps) {
+export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSectionProps) {
   const isLoading = status === "generating" || status === "scanning";
   const isIdle = status === "idle" || status === "error";
 
   return (
     <section
-      className={`overflow-hidden px-4 sm:px-6 transition-colors duration-300 ${
-        isIdle
-          ? "flex min-h-[calc(100vh-65px)] flex-col items-center justify-center py-16 sm:py-20"
-          : "border-b py-8 sm:py-10"
-      }`}
       style={{
-        background: "var(--sp-bg)",
-        borderColor: "var(--sp-border)",
+        background: "#000000",
+        borderBottom: isIdle ? "none" : "1px solid #1f1f1f",
       }}
+      className={isIdle
+        ? "flex min-h-[calc(100vh-57px)] flex-col items-center justify-center px-4 sm:px-6 py-16"
+        : "px-4 sm:px-6 py-8 sm:py-10"
+      }
     >
-      <div
-        className={`relative z-10 w-full mx-auto ${
-          isIdle ? "max-w-2xl text-center" : "max-w-2xl"
-        }`}
-      >
-        {/* Full hero content — idle only */}
+      <div className={`w-full mx-auto ${isIdle ? "max-w-2xl text-center" : "max-w-2xl"}`}>
+
+        {/* Full hero — idle only */}
         {isIdle && (
           <>
             {/* Eyebrow */}
             <p
-              className="mb-6 text-xs font-bold uppercase tracking-widest animate-fade-in-up"
-              style={{ color: "var(--sp-accent)", letterSpacing: "0.18em" }}
+              className="animate-fade-in-up"
+              style={{
+                fontFamily: "var(--font-mono, monospace)",
+                fontSize: 11,
+                color: "#888888",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                marginBottom: 24,
+              }}
             >
               AI Search Intelligence
             </p>
 
-            {/* Headline — Syne bold geometric */}
+            {/* Headline */}
             <h1
-              className="mb-6 font-bold text-[32px] sm:text-[48px] lg:text-[60px] animate-fade-in-up"
+              className="animate-fade-in-up"
               style={{
-                lineHeight: 1.12,
+                fontFamily: "var(--font-heading, system-ui)",
+                fontWeight: 700,
+                fontSize: "clamp(36px, 6vw, 64px)",
+                lineHeight: 1.1,
                 letterSpacing: "-0.02em",
-                fontFamily: "var(--font-heading)",
-                color: "var(--sp-text)",
+                color: "#ffffff",
+                marginBottom: 24,
                 animationDelay: "0.08s",
               }}
             >
@@ -62,12 +63,14 @@ export function HeroSection({
 
             {/* Subheadline */}
             <p
-              className="mb-10 text-base sm:text-lg animate-fade-in-up"
+              className="animate-fade-in-up"
               style={{
-                color: "var(--sp-text-3)",
-                lineHeight: 1.65,
+                fontFamily: "var(--font-heading, system-ui)",
+                fontSize: 18,
+                color: "#888888",
+                lineHeight: 1.6,
+                marginBottom: 40,
                 animationDelay: "0.16s",
-                fontFamily: "var(--font-dm-sans, system-ui)",
               }}
             >
               sparrwo scans ChatGPT, Gemini, Claude &amp; Perplexity to show
@@ -78,10 +81,11 @@ export function HeroSection({
 
         {/* Input row */}
         <div
-          className="rounded-full px-2 py-2 flex flex-col sm:flex-row gap-2 animate-fade-in-up"
+          className="animate-fade-in-up"
           style={{
-            background: "var(--sp-input-bg)",
-            border: "1px solid var(--sp-input-border)",
+            display: "flex",
+            flexDirection: "row",
+            gap: 8,
             animationDelay: isIdle ? "0.22s" : "0s",
           }}
         >
@@ -89,33 +93,66 @@ export function HeroSection({
             type="text"
             value={domain}
             onChange={(e) => onDomainChange(e.target.value)}
-            onKeyDown={(e) =>
-              e.key === "Enter" && !isLoading && onScan(domain)
-            }
+            onKeyDown={(e) => e.key === "Enter" && !isLoading && onScan(domain)}
             placeholder="yourdomain.com"
             disabled={isLoading}
-            className="flex-1 bg-transparent px-4 py-2.5 placeholder-[#666] focus:outline-none text-sm disabled:opacity-50 min-w-0 w-full"
-            style={{ color: "var(--sp-text)" }}
+            style={{
+              flex: 1,
+              background: "#000000",
+              border: "1px solid #1f1f1f",
+              borderRadius: 8,
+              padding: "11px 16px",
+              fontSize: 14,
+              color: "#ffffff",
+              outline: "none",
+              minWidth: 0,
+              transition: "border-color 150ms ease",
+              fontFamily: "var(--font-body, system-ui)",
+              opacity: isLoading ? 0.5 : 1,
+            }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "#333333")}
+            onBlur={(e) => (e.currentTarget.style.borderColor = "#1f1f1f")}
           />
           <button
             onClick={() => onScan(domain)}
             disabled={isLoading || !domain.trim()}
-            className="flex items-center justify-center gap-2 rounded-full px-6 py-2.5 text-sm font-bold transition-all whitespace-nowrap disabled:cursor-not-allowed w-full sm:w-auto"
-            style={
-              isLoading
-                ? { background: "var(--sp-card)", color: "var(--sp-text-4)" }
-                : {
-                    background: "var(--sp-accent)",
-                    color: "#fff",
-                    opacity: !domain.trim() ? 0.5 : 1,
-                  }
-            }
+            style={{
+              background: isLoading ? "#141414" : "#7c3aed",
+              color: isLoading ? "#444444" : "#ffffff",
+              border: "none",
+              borderRadius: 8,
+              padding: "11px 20px",
+              fontSize: 14,
+              fontWeight: 600,
+              fontFamily: "var(--font-heading, system-ui)",
+              cursor: isLoading || !domain.trim() ? "not-allowed" : "pointer",
+              whiteSpace: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              transition: "background 150ms ease",
+              opacity: !domain.trim() && !isLoading ? 0.5 : 1,
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading && domain.trim()) e.currentTarget.style.background = "#6d28d9";
+            }}
+            onMouseLeave={(e) => {
+              if (!isLoading) e.currentTarget.style.background = isLoading ? "#141414" : "#7c3aed";
+            }}
           >
             {isLoading ? (
               <>
                 <span
-                  className="w-3.5 h-3.5 rounded-full border-2 border-[#444] border-t-[#888] animate-spin flex-shrink-0"
-                  style={{ animationDuration: "0.8s" }}
+                  style={{
+                    width: 14, height: 14,
+                    borderRadius: "50%",
+                    border: "2px solid #333",
+                    borderTopColor: "#888",
+                    display: "inline-block",
+                    animation: "sp-ring-spin 0.8s linear infinite",
+                    flexShrink: 0,
+                  }}
                 />
                 {status === "generating" ? "Analyzing..." : "Scanning..."}
               </>
@@ -126,7 +163,7 @@ export function HeroSection({
         </div>
 
         {status === "error" && (
-          <p className="mt-3 text-sm text-red-400 text-center">
+          <p style={{ marginTop: 12, fontSize: 13, color: "#ef4444", textAlign: "center" }}>
             Something went wrong. Please try again.
           </p>
         )}
@@ -134,17 +171,28 @@ export function HeroSection({
         {/* Feature pills — idle only */}
         {isIdle && (
           <div
-            className="mt-8 flex items-center justify-center gap-2 flex-wrap animate-fade-in-up"
-            style={{ animationDelay: "0.30s" }}
+            className="animate-fade-in-up"
+            style={{
+              marginTop: 28,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              flexWrap: "wrap",
+              animationDelay: "0.30s",
+            }}
           >
             {["4 AI engines", "24 buyer prompts", "Free scan"].map((pill) => (
               <span
                 key={pill}
-                className="rounded-full px-3 py-1 text-xs font-medium"
                 style={{
-                  background: "var(--sp-card)",
-                  color: "var(--sp-text-3)",
-                  border: "1px solid var(--sp-border-card)",
+                  border: "1px solid #1f1f1f",
+                  background: "#0c0c0c",
+                  color: "#888888",
+                  borderRadius: 6,
+                  padding: "4px 12px",
+                  fontSize: 12,
+                  fontFamily: "var(--font-mono, monospace)",
                 }}
               >
                 {pill}
@@ -156,28 +204,27 @@ export function HeroSection({
 
       {/* Marketing sections — idle only */}
       {isIdle && (
-        <div className="relative z-10 w-full mt-20">
+        <div style={{ width: "100%", marginTop: 80 }}>
+
           {/* Social proof bar */}
-          <div
-            className="border-y px-6 py-6 -mx-6"
-            style={{
-              borderColor: "var(--sp-border)",
-              background: "var(--sp-bg-section)",
-            }}
-          >
+          <div style={{ borderTop: "1px solid #1f1f1f", borderBottom: "1px solid #1f1f1f", padding: "24px 24px", background: "#000000" }}>
             <div className="mx-auto max-w-6xl flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
-              <p className="text-sm" style={{ color: "var(--sp-text-4)" }}>
+              <p style={{ fontSize: 13, color: "#444444", fontFamily: "var(--font-mono, monospace)" }}>
                 Trusted by{" "}
-                <span className="font-semibold" style={{ color: "var(--sp-text)" }}>
-                  300+ B2B SaaS teams
-                </span>
+                <span style={{ color: "#ffffff" }}>300+ B2B SaaS teams</span>
               </p>
-              <div className="flex items-center gap-8">
+              <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
                 {["Acme Corp", "Streamline HQ", "LaunchPad"].map((name) => (
                   <span
                     key={name}
-                    className="text-sm font-semibold tracking-wide"
-                    style={{ color: "var(--sp-border-card)" }}
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: "#333333",
+                      fontFamily: "var(--font-mono, monospace)",
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                    }}
                   >
                     {name}
                   </span>
@@ -187,51 +234,74 @@ export function HeroSection({
           </div>
 
           {/* Pain section */}
-          <div className="px-4 sm:px-6 py-16 sm:py-24 mx-auto max-w-6xl">
+          <div style={{ padding: "80px 24px", maxWidth: 1152, margin: "0 auto" }}>
             <h2
-              className="mb-12 text-center text-2xl font-bold sm:text-3xl"
               style={{
-                fontFamily: "var(--font-heading)",
+                fontFamily: "var(--font-heading, system-ui)",
+                fontWeight: 700,
+                fontSize: "clamp(22px, 3vw, 30px)",
                 letterSpacing: "-0.02em",
-                color: "var(--sp-text)",
+                color: "#ffffff",
+                textAlign: "center",
+                marginBottom: 48,
               }}
             >
               The AI search problem no one is talking about
             </h2>
-            <div className="grid gap-5 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-3">
               {[
                 {
-                  icon: "⚠️",
+                  step: "01",
                   title: "Your competitor is in ChatGPT. You're not.",
                   body: "When a buyer asks ChatGPT to recommend tools in your category, your competitor's name comes up — yours doesn't.",
                 },
                 {
-                  icon: "🔍",
+                  step: "02",
                   title: "Buyers research on AI before they Google anything.",
                   body: "Over 60% of B2B buyers now start product research on AI tools. If you're not there, you don't exist.",
                 },
                 {
-                  icon: "📉",
+                  step: "03",
                   title: "You're invisible where decisions are made.",
                   body: "Your SEO is fine. Your ads are running. But deals are being lost at the AI search layer — silently.",
                 },
               ].map((card) => (
                 <div
                   key={card.title}
-                  className="rounded-2xl border p-6 transition-all hover:-translate-y-0.5"
                   style={{
-                    background: "var(--sp-card)",
-                    borderColor: "var(--sp-border-card)",
+                    background: "#0c0c0c",
+                    border: "1px solid #1f1f1f",
+                    borderRadius: 8,
+                    padding: 24,
+                    transition: "border-color 150ms ease",
                   }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#333333")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#1f1f1f")}
                 >
-                  <div className="mb-4 text-3xl">{card.icon}</div>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-mono, monospace)",
+                      fontSize: 11,
+                      color: "#7c3aed",
+                      letterSpacing: "0.1em",
+                      marginBottom: 16,
+                    }}
+                  >
+                    {card.step}
+                  </p>
                   <h3
-                    className="mb-3 text-base font-semibold leading-snug"
-                    style={{ color: "var(--sp-text)" }}
+                    style={{
+                      fontFamily: "var(--font-heading, system-ui)",
+                      fontWeight: 600,
+                      fontSize: 15,
+                      color: "#ffffff",
+                      lineHeight: 1.4,
+                      marginBottom: 12,
+                    }}
                   >
                     {card.title}
                   </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: "var(--sp-text-3)" }}>
+                  <p style={{ fontSize: 13, color: "#888888", lineHeight: 1.65 }}>
                     {card.body}
                   </p>
                 </div>
@@ -240,25 +310,28 @@ export function HeroSection({
           </div>
 
           {/* How it works */}
-          <div
-            className="border-t px-6 py-24 -mx-6"
-            style={{
-              borderColor: "var(--sp-border)",
-              background: "var(--sp-bg-section)",
-            }}
-          >
-            <div className="mx-auto max-w-4xl text-center">
+          <div style={{ borderTop: "1px solid #1f1f1f", padding: "80px 24px", background: "#000000" }}>
+            <div style={{ maxWidth: 896, margin: "0 auto", textAlign: "center" }}>
               <h2
-                className="mb-4 text-2xl font-bold sm:text-3xl"
                 style={{
-                  fontFamily: "var(--font-heading)",
+                  fontFamily: "var(--font-heading, system-ui)",
+                  fontWeight: 700,
+                  fontSize: "clamp(22px, 3vw, 30px)",
                   letterSpacing: "-0.02em",
-                  color: "var(--sp-text)",
+                  color: "#ffffff",
+                  marginBottom: 12,
                 }}
               >
                 How it works
               </h2>
-              <p className="mb-16 text-sm" style={{ color: "var(--sp-text-4)" }}>
+              <p
+                style={{
+                  fontFamily: "var(--font-mono, monospace)",
+                  fontSize: 12,
+                  color: "#444444",
+                  marginBottom: 56,
+                }}
+              >
                 Three steps. Sixty seconds. Zero fluff.
               </p>
               <div className="grid gap-10 sm:grid-cols-3">
@@ -279,24 +352,38 @@ export function HeroSection({
                     body: "Get a visibility score by buyer intent stage — and exactly where to focus to fix the gaps.",
                   },
                 ].map((item) => (
-                  <div key={item.step} className="flex flex-col items-center">
+                  <div key={item.step} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                     <div
-                      className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl text-sm font-bold border"
                       style={{
-                        borderColor: "var(--sp-accent-border)",
-                        background: "var(--sp-accent-bg)",
-                        color: "var(--sp-accent)",
+                        width: 48,
+                        height: 48,
+                        borderRadius: 8,
+                        border: "1px solid rgba(124,58,237,0.3)",
+                        background: "rgba(124,58,237,0.08)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginBottom: 20,
+                        fontFamily: "var(--font-mono, monospace)",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "#7c3aed",
                       }}
                     >
                       {item.step}
                     </div>
                     <h3
-                      className="mb-3 text-base font-semibold"
-                      style={{ color: "var(--sp-text)" }}
+                      style={{
+                        fontFamily: "var(--font-heading, system-ui)",
+                        fontWeight: 600,
+                        fontSize: 15,
+                        color: "#ffffff",
+                        marginBottom: 10,
+                      }}
                     >
                       {item.title}
                     </h3>
-                    <p className="text-sm leading-relaxed" style={{ color: "var(--sp-text-3)" }}>
+                    <p style={{ fontSize: 13, color: "#888888", lineHeight: 1.65 }}>
                       {item.body}
                     </p>
                   </div>
@@ -306,47 +393,78 @@ export function HeroSection({
           </div>
 
           {/* Bottom CTA */}
-          <div className="px-4 sm:px-6 py-16 sm:py-24 text-center">
-            <div className="mx-auto max-w-2xl">
+          <div style={{ padding: "80px 24px", textAlign: "center" }}>
+            <div style={{ maxWidth: 560, margin: "0 auto" }}>
               <h2
-                className="mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold"
                 style={{
-                  fontFamily: "var(--font-heading)",
-                  letterSpacing: "-0.025em",
-                  color: "var(--sp-text)",
+                  fontFamily: "var(--font-heading, system-ui)",
+                  fontWeight: 700,
+                  fontSize: "clamp(22px, 3vw, 36px)",
+                  letterSpacing: "-0.02em",
+                  color: "#ffffff",
+                  marginBottom: 12,
                 }}
               >
                 Ready to see where you stand?
               </h2>
-              <p className="mb-8 sm:mb-10 text-sm" style={{ color: "var(--sp-text-3)" }}>
-                Free scan. No account. Takes 60 seconds.
-              </p>
-              <div
-                className="rounded-full px-2 py-2"
+              <p
                 style={{
-                  background: "var(--sp-input-bg)",
-                  border: "1px solid var(--sp-input-border)",
+                  fontFamily: "var(--font-mono, monospace)",
+                  fontSize: 12,
+                  color: "#444444",
+                  marginBottom: 36,
                 }}
               >
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="text"
-                    value={domain}
-                    onChange={(e) => onDomainChange(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && onScan(domain)}
-                    placeholder="yourdomain.com"
-                    className="flex-1 bg-transparent px-4 py-2.5 placeholder-[#666] focus:outline-none text-sm min-w-0 w-full"
-                    style={{ color: "var(--sp-text)" }}
-                  />
-                  <button
-                    onClick={() => onScan(domain)}
-                    disabled={!domain.trim()}
-                    className="rounded-full px-6 py-2.5 text-sm font-bold transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
-                    style={{ background: "var(--sp-accent)", color: "#fff" }}
-                  >
-                    Check My AI Visibility
-                  </button>
-                </div>
+                Free scan. No account. Takes 60 seconds.
+              </p>
+              <div style={{ display: "flex", gap: 8, maxWidth: 480, margin: "0 auto" }}>
+                <input
+                  type="text"
+                  value={domain}
+                  onChange={(e) => onDomainChange(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && onScan(domain)}
+                  placeholder="yourdomain.com"
+                  style={{
+                    flex: 1,
+                    background: "#000000",
+                    border: "1px solid #1f1f1f",
+                    borderRadius: 8,
+                    padding: "11px 16px",
+                    fontSize: 14,
+                    color: "#ffffff",
+                    outline: "none",
+                    transition: "border-color 150ms ease",
+                    fontFamily: "var(--font-body, system-ui)",
+                    minWidth: 0,
+                  }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "#333333")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "#1f1f1f")}
+                />
+                <button
+                  onClick={() => onScan(domain)}
+                  disabled={!domain.trim()}
+                  style={{
+                    background: "#7c3aed",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "11px 20px",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    fontFamily: "var(--font-heading, system-ui)",
+                    cursor: !domain.trim() ? "not-allowed" : "pointer",
+                    whiteSpace: "nowrap",
+                    opacity: !domain.trim() ? 0.5 : 1,
+                    transition: "background 150ms ease",
+                    flexShrink: 0,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (domain.trim()) e.currentTarget.style.background = "#6d28d9";
+                  }}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "#7c3aed")}
+                >
+                  Check My Visibility
+                </button>
               </div>
             </div>
           </div>

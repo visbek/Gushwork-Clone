@@ -10,7 +10,7 @@ import {
   type CategoryScore,
 } from "@/components/scanner/types";
 
-// ── Constants ──────────────────────────────────────────────────────────────────
+// ── Constants ─────────────────────────────────────────────────────────────────
 
 const ENGINES = [
   { key: "gemini" as const, label: "Gemini", color: "#4285f4" },
@@ -24,37 +24,41 @@ const CATEGORIES = [
     key: "informational" as Category,
     label: "Informational",
     description: "Buyer learning about the problem",
-    badge: "bg-blue-500/15 text-blue-400 border border-blue-500/25",
-    headerBorder: "border-b border-blue-500/15",
-    headerBgDark: "#111a26",
-    headerBgLight: "#eff4ff",
+    badgeStyle: {
+      border: "1px solid #1d3a6e",
+      color: "#3b82f6",
+      background: "#0d1f3c",
+    },
   },
   {
     key: "discovery" as Category,
     label: "Discovery",
     description: "Buyer looking for vendors",
-    badge: "bg-violet-500/15 text-violet-400 border border-violet-500/25",
-    headerBorder: "border-b border-violet-500/15",
-    headerBgDark: "#16112a",
-    headerBgLight: "#f5f0ff",
+    badgeStyle: {
+      border: "1px solid #2d1f6e",
+      color: "#7c3aed",
+      background: "#170d3c",
+    },
   },
   {
     key: "commercial" as Category,
     label: "Commercial",
     description: "Buyer comparing options",
-    badge: "bg-amber-500/15 text-amber-400 border border-amber-500/25",
-    headerBorder: "border-b border-amber-500/15",
-    headerBgDark: "#1e1a10",
-    headerBgLight: "#fffbef",
+    badgeStyle: {
+      border: "1px solid #3a2d00",
+      color: "#f59e0b",
+      background: "#1f1800",
+    },
   },
   {
     key: "transactional" as Category,
     label: "Transactional",
     description: "Buyer ready to purchase",
-    badge: "bg-emerald-500/15 text-emerald-400 border border-emerald-500/25",
-    headerBorder: "border-b border-emerald-500/15",
-    headerBgDark: "#0f1e18",
-    headerBgLight: "#effaf5",
+    badgeStyle: {
+      border: "1px solid #0d3a1f",
+      color: "#22c55e",
+      background: "#0d2018",
+    },
   },
 ];
 
@@ -69,18 +73,12 @@ const RECOMMENDATIONS: Record<Category, string> = {
     "Optimize your pricing page and product listings for high-intent searches.",
 };
 
-// ── Utils ──────────────────────────────────────────────────────────────────────
+// ── Utils ─────────────────────────────────────────────────────────────────────
 
 function scoreColor(score: number) {
-  if (score > 66) return "#10b981";
+  if (score > 66) return "#22c55e";
   if (score >= 33) return "#f59e0b";
   return "#ef4444";
-}
-
-function scoreTextClass(score: number) {
-  if (score > 66) return "text-emerald-400";
-  if (score >= 33) return "text-amber-400";
-  return "text-red-400";
 }
 
 function scoreMessage(score: number) {
@@ -94,17 +92,20 @@ function pct(cs: CategoryScore) {
   return Math.round((cs.appeared / cs.total) * 100);
 }
 
-// ── useCountUp ─────────────────────────────────────────────────────────────────
+function isValidEmail(email: string): boolean {
+  const atIdx = email.indexOf("@");
+  if (email.length < 5 || atIdx < 1) return false;
+  return email.slice(atIdx + 1).includes(".");
+}
+
+// ── useCountUp ────────────────────────────────────────────────────────────────
 
 function useCountUp(target: number, active: boolean, duration = 1500) {
   const [value, setValue] = useState(0);
   const raf = useRef<number>(0);
 
   useEffect(() => {
-    if (!active) {
-      setValue(0);
-      return;
-    }
+    if (!active) { setValue(0); return; }
     const t0 = performance.now();
     const tick = (now: number) => {
       const p = Math.min((now - t0) / duration, 1);
@@ -118,7 +119,7 @@ function useCountUp(target: number, active: boolean, duration = 1500) {
   return value;
 }
 
-// ── EngineCard ─────────────────────────────────────────────────────────────────
+// ── EngineCard ────────────────────────────────────────────────────────────────
 
 function EngineCard({
   label,
@@ -132,42 +133,50 @@ function EngineCard({
   const display = useCountUp(engine?.score ?? 0, active && !!engine?.available);
   return (
     <div
-      className="rounded-2xl border p-5 text-center transition-all hover:-translate-y-0.5"
       style={{
-        background: "var(--sp-card)",
-        borderColor: "var(--sp-border-card)",
+        background: "#0c0c0c",
+        border: "1px solid #1f1f1f",
+        borderRadius: 8,
+        padding: "20px 16px",
+        textAlign: "center",
+        transition: "border-color 150ms ease",
       }}
+      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#333333")}
+      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#1f1f1f")}
     >
-      <p className="text-sm font-semibold mb-3" style={{ color: "var(--sp-text-2)" }}>
+      <p
+        style={{
+          fontFamily: "var(--font-heading, system-ui)",
+          fontSize: 13,
+          fontWeight: 500,
+          color: "#888888",
+          marginBottom: 12,
+        }}
+      >
         {label}
       </p>
       {engine?.available ? (
         <>
           <p
-            className="text-3xl font-extrabold"
             style={{
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: 30,
+              fontWeight: 700,
               color: scoreColor(engine.score),
-              fontFamily: "var(--font-dm-sans, system-ui)",
+              lineHeight: 1,
             }}
           >
             {display}
-            <span className="text-base font-normal" style={{ color: "var(--sp-text-4)" }}>
-              %
-            </span>
+            <span style={{ fontSize: 14, fontWeight: 400, color: "#444444" }}>%</span>
           </p>
-          <p className="mt-1 text-xs" style={{ color: "var(--sp-text-4)" }}>
+          <p style={{ marginTop: 6, fontSize: 11, color: "#444444", fontFamily: "var(--font-mono, monospace)" }}>
             visibility
           </p>
         </>
       ) : (
         <>
-          <p
-            className="text-2xl mb-1"
-            style={{ filter: "grayscale(1)", opacity: 0.4 }}
-          >
-            🔒
-          </p>
-          <p className="text-xs" style={{ color: "var(--sp-text-4)" }}>
+          <p style={{ fontSize: 20, opacity: 0.3, marginBottom: 4 }}>🔒</p>
+          <p style={{ fontSize: 11, color: "#444444", fontFamily: "var(--font-mono, monospace)" }}>
             Add API key
           </p>
         </>
@@ -176,7 +185,7 @@ function EngineCard({
   );
 }
 
-// ── ResultsSection ─────────────────────────────────────────────────────────────
+// ── ResultsSection ────────────────────────────────────────────────────────────
 
 interface ResultsSectionProps {
   scanData: ScanData;
@@ -191,14 +200,6 @@ interface ResultsSectionProps {
   sectionRef: React.RefObject<HTMLDivElement | null>;
 }
 
-function isValidEmail(email: string): boolean {
-  const atIdx = email.indexOf("@");
-  if (email.length < 5) return false;
-  if (atIdx < 1) return false;
-  const afterAt = email.slice(atIdx + 1);
-  return afterAt.includes(".");
-}
-
 export function ResultsSection({
   scanData,
   emailCaptured,
@@ -211,7 +212,6 @@ export function ResultsSection({
   onEmailSubmit,
   sectionRef,
 }: ResultsSectionProps) {
-  const scoreActive = true;
   const [emailError, setEmailError] = useState("");
 
   const insights = scanData.categoryScores
@@ -229,36 +229,51 @@ export function ResultsSection({
   return (
     <section
       ref={sectionRef}
-      className="px-4 sm:px-6 pb-16 sm:pb-24 pt-6 sm:pt-8 animate-fade-in-up transition-colors duration-300"
-      style={{ background: "var(--sp-bg)" }}
+      className="animate-fade-in-up"
+      style={{ background: "#000000", padding: "32px 16px 80px" }}
     >
       {/* Toast */}
       {showToast && (
         <div
-          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 rounded-xl border px-5 py-3 text-sm font-medium shadow-2xl backdrop-blur-md animate-fade-in-up"
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-fade-in-up"
           style={{
-            borderColor: "var(--sp-accent-border)",
-            background: "var(--sp-accent-bg)",
-            color: "var(--sp-accent)",
+            border: "1px solid rgba(124,58,237,0.4)",
+            background: "rgba(124,58,237,0.12)",
+            color: "#7c3aed",
+            borderRadius: 8,
+            padding: "12px 20px",
+            fontSize: 13,
+            fontFamily: "var(--font-mono, monospace)",
           }}
         >
           Report unlocked! We&apos;ll send you weekly AI updates for this domain.
         </div>
       )}
 
-      <div className="mx-auto max-w-4xl">
-        {/* Score */}
-        <div className="py-8 sm:py-12 flex flex-col items-center gap-3">
-          <div className="scale-75 sm:scale-100 origin-center">
-            <ScoreCircle score={scanData.overallScore} active={scoreActive} />
-          </div>
+      <div style={{ maxWidth: 896, margin: "0 auto" }}>
+
+        {/* Score circle */}
+        <div style={{ padding: "40px 0 32px", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+          <ScoreCircle score={scanData.overallScore} active={true} />
           <p
-            className="text-xs font-semibold uppercase tracking-widest"
-            style={{ color: "var(--sp-text-4)", letterSpacing: "0.14em" }}
+            style={{
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: 11,
+              color: "#444444",
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+            }}
           >
             AI Visibility Score
           </p>
-          <p className={`text-base sm:text-lg font-semibold ${scoreTextClass(scanData.overallScore)}`}>
+          <p
+            style={{
+              fontFamily: "var(--font-heading, system-ui)",
+              fontSize: 16,
+              fontWeight: 600,
+              color: scoreColor(scanData.overallScore),
+            }}
+          >
             {scoreMessage(scanData.overallScore)}
           </p>
         </div>
@@ -266,15 +281,23 @@ export function ResultsSection({
         {/* ICP card */}
         {scanData.businessProfile && (
           <div
-            className="mb-8 rounded-2xl border p-6"
             style={{
-              background: "var(--sp-card)",
-              borderColor: "var(--sp-border-card)",
+              background: "#0c0c0c",
+              border: "1px solid #1f1f1f",
+              borderRadius: 8,
+              padding: 24,
+              marginBottom: 24,
             }}
           >
             <p
-              className="mb-4 text-[11px] font-semibold uppercase tracking-widest"
-              style={{ color: "var(--sp-text-4)" }}
+              style={{
+                fontFamily: "var(--font-mono, monospace)",
+                fontSize: 10,
+                color: "#444444",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                marginBottom: 16,
+              }}
             >
               ICP Profile Detected
             </p>
@@ -294,19 +317,33 @@ export function ResultsSection({
               ].map((item) => (
                 <div
                   key={item.label}
-                  className="rounded-xl p-4"
                   style={{
-                    background: "var(--sp-card-inner)",
-                    border: "1px solid var(--sp-border)",
+                    background: "#141414",
+                    border: "1px solid #1f1f1f",
+                    borderRadius: 6,
+                    padding: "12px 16px",
                   }}
                 >
                   <p
-                    className="text-[10px] mb-1.5 font-semibold uppercase tracking-wider"
-                    style={{ color: "var(--sp-text-4)" }}
+                    style={{
+                      fontFamily: "var(--font-mono, monospace)",
+                      fontSize: 10,
+                      color: "#444444",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      marginBottom: 6,
+                    }}
                   >
                     {item.label}
                   </p>
-                  <p className="text-sm" style={{ color: "var(--sp-text-2)" }}>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-heading, system-ui)",
+                      fontSize: 13,
+                      color: "#ffffff",
+                      lineHeight: 1.5,
+                    }}
+                  >
                     {item.val}
                   </p>
                 </div>
@@ -316,42 +353,49 @@ export function ResultsSection({
         )}
 
         {/* Engine cards */}
-        <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4" style={{ marginBottom: 32 }}>
           {ENGINES.map(({ key, label }) => (
-            <EngineCard
-              key={key}
-              label={label}
-              engine={scanData.engines?.[key]}
-              active={scoreActive}
-            />
+            <EngineCard key={key} label={label} engine={scanData.engines?.[key]} active={true} />
           ))}
         </div>
 
         {/* Results table */}
         <div
-          className="rounded-2xl border overflow-hidden"
-          style={{ borderColor: "var(--sp-border-card)" }}
+          style={{
+            border: "1px solid #1f1f1f",
+            borderRadius: 8,
+            overflow: "hidden",
+          }}
         >
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[480px] text-sm">
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", minWidth: 480, borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
-                <tr
-                  style={{
-                    borderBottom: "1px solid var(--sp-border-card)",
-                    background: "var(--sp-card-inner)",
-                  }}
-                >
+                <tr style={{ borderBottom: "1px solid #1f1f1f", background: "#0c0c0c" }}>
                   <th
-                    className="px-4 sm:px-5 py-3.5 text-left font-semibold w-full"
-                    style={{ color: "var(--sp-text-2)" }}
+                    style={{
+                      padding: "12px 20px",
+                      textAlign: "left",
+                      fontFamily: "var(--font-heading, system-ui)",
+                      fontWeight: 600,
+                      fontSize: 12,
+                      color: "#888888",
+                    }}
                   >
                     Buyer Prompt
                   </th>
                   {ENGINES.map(({ key, label }) => (
                     <th
                       key={key}
-                      className="hidden sm:table-cell px-4 py-3.5 text-center font-semibold whitespace-nowrap"
-                      style={{ color: "var(--sp-text-2)" }}
+                      className="hidden sm:table-cell"
+                      style={{
+                        padding: "12px 16px",
+                        textAlign: "center",
+                        fontFamily: "var(--font-heading, system-ui)",
+                        fontWeight: 600,
+                        fontSize: 12,
+                        color: "#888888",
+                        whiteSpace: "nowrap",
+                      }}
                     >
                       {label}
                     </th>
@@ -381,24 +425,43 @@ export function ResultsSection({
                         <tr key={`h-${catMeta.key}`}>
                           <td
                             colSpan={ENGINES.length + 1}
-                            className={`px-5 py-3 ${catMeta.headerBorder}`}
-                            style={{ background: "var(--sp-card)" }}
+                            style={{ borderBottom: "1px solid #1f1f1f", background: "#000000" }}
                           >
-                            <div className="flex items-center justify-between gap-2 flex-wrap">
-                              <div className="flex items-center gap-3">
-                                <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider ${catMeta.badge}`}>
-                                  {catMeta.label.toUpperCase()}
+                            <div
+                              style={{
+                                padding: "10px 20px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                gap: 8,
+                                flexWrap: "wrap",
+                              }}
+                            >
+                              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                <span
+                                  style={{
+                                    ...catMeta.badgeStyle,
+                                    borderRadius: 4,
+                                    padding: "2px 8px",
+                                    fontSize: 10,
+                                    fontFamily: "var(--font-mono, monospace)",
+                                    fontWeight: 700,
+                                    letterSpacing: "0.08em",
+                                    textTransform: "uppercase",
+                                  }}
+                                >
+                                  {catMeta.label}
                                 </span>
                                 <span
-                                  className="text-xs hidden sm:inline"
-                                  style={{ color: "var(--sp-text-4)" }}
+                                  className="hidden sm:inline"
+                                  style={{ fontSize: 12, color: "#444444", fontFamily: "var(--font-mono, monospace)" }}
                                 >
                                   {catMeta.description}
                                 </span>
                               </div>
-                              <span className="text-xs" style={{ color: "var(--sp-text-4)" }}>
-                                {appearedCount}/{catResults.length} appeared
-                                <span className={`ml-2 font-semibold ${scoreTextClass(catPct)}`}>
+                              <span style={{ fontSize: 12, color: "#444444", fontFamily: "var(--font-mono, monospace)" }}>
+                                {appearedCount}/{catResults.length} appeared{" "}
+                                <span style={{ color: scoreColor(catPct), fontWeight: 600 }}>
                                   ({catPct}%)
                                 </span>
                               </span>
@@ -413,27 +476,22 @@ export function ResultsSection({
                       const visible = emailCaptured || rowCount < FREE_ROWS;
 
                       if (visible) {
+                        const rowBg = rowCount % 2 === 0 ? "#000000" : "#0c0c0c";
                         elements.push(
                           <tr
                             key={`r-${catMeta.key}-${i}`}
-                            className="transition-colors"
-                            style={{
-                              background: rowCount % 2 === 0
-                                ? "var(--sp-row-even)"
-                                : "var(--sp-row-odd)",
-                              borderBottom: "1px solid var(--sp-border)",
-                            }}
-                            onMouseEnter={(e) =>
-                              (e.currentTarget.style.background = "var(--sp-row-hover)")
-                            }
-                            onMouseLeave={(e) =>
-                              (e.currentTarget.style.background =
-                                rowCount % 2 === 0 ? "var(--sp-row-even)" : "var(--sp-row-odd)")
-                            }
+                            style={{ borderBottom: "1px solid #0f0f0f", background: rowBg, transition: "background 150ms ease" }}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = "#141414")}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = rowBg)}
                           >
                             <td
-                              className="px-4 sm:px-5 py-4 text-sm leading-relaxed"
-                              style={{ color: "var(--sp-text-2)" }}
+                              style={{
+                                padding: "16px 20px",
+                                fontSize: 13,
+                                color: "#888888",
+                                lineHeight: 1.55,
+                                fontFamily: "var(--font-body, system-ui)",
+                              }}
                             >
                               {row.prompt}
                             </td>
@@ -443,43 +501,49 @@ export function ResultsSection({
                                 key as keyof Pick<PromptResult, "gemini" | "claude" | "chatgpt" | "perplexity">
                               ] as EngineResult | undefined;
                               return (
-                                <td key={key} className="px-2 sm:px-4 py-3 sm:py-4 text-center align-middle">
-                                  <div className="flex flex-col items-center gap-1">
+                                <td
+                                  key={key}
+                                  className="hidden sm:table-cell"
+                                  style={{ padding: "16px", textAlign: "center", verticalAlign: "middle" }}
+                                >
+                                  {!eng?.available ? (
+                                    <span style={{ color: "#333333", fontSize: 14 }}>🔒</span>
+                                  ) : res?.appeared ? (
                                     <span
-                                      className="sm:hidden text-[9px] font-semibold uppercase tracking-wide"
-                                      style={{ color: "var(--sp-text-4)" }}
-                                    >
-                                      {label}
-                                    </span>
-                                    {!eng?.available ? (
-                                      <span style={{ filter: "grayscale(1)", opacity: 0.25, fontSize: 16 }}>
-                                        🔒
-                                      </span>
-                                    ) : res?.appeared ? (
-                                      <span
-                                        className="inline-flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full text-xs font-bold"
-                                        title={res.snippet || "Appeared"}
-                                        style={{
-                                          background: "rgba(108,99,255,0.12)",
-                                          color: "var(--sp-accent)",
-                                          border: "1px solid var(--sp-accent-border)",
-                                        }}
-                                      >
-                                        ✓
-                                      </span>
-                                    ) : (
-                                      <span
-                                        className="inline-flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full text-xs font-bold"
-                                        style={{
-                                          background: "rgba(239,68,68,0.1)",
-                                          color: "#ef4444",
-                                          border: "1px solid rgba(239,68,68,0.2)",
-                                        }}
-                                      >
-                                        ✗
-                                      </span>
-                                    )}
-                                  </div>
+                                      title={res.snippet || "Appeared"}
+                                      style={{
+                                        display: "inline-block",
+                                        width: 8,
+                                        height: 8,
+                                        borderRadius: "50%",
+                                        background: "#22c55e",
+                                      }}
+                                    />
+                                  ) : (
+                                    <span
+                                      style={{
+                                        display: "inline-block",
+                                        width: 8,
+                                        height: 8,
+                                        borderRadius: "50%",
+                                        background: "#ef4444",
+                                        opacity: 0.6,
+                                      }}
+                                    />
+                                  )}
+                                  {/* Mobile label */}
+                                  <span
+                                    className="sm:hidden block"
+                                    style={{
+                                      fontSize: 9,
+                                      color: "#444444",
+                                      fontFamily: "var(--font-mono, monospace)",
+                                      textTransform: "uppercase",
+                                      marginTop: 4,
+                                    }}
+                                  >
+                                    {label}
+                                  </span>
                                 </td>
                               );
                             })}
@@ -489,59 +553,73 @@ export function ResultsSection({
 
                       rowCount++;
 
-                      // Email wall after 4th row
+                      // Email wall after row 4
                       if (rowCount === FREE_ROWS && !emailCaptured && hiddenCount > 0) {
                         elements.push(
                           <tr key="wall">
-                            <td colSpan={ENGINES.length + 1} className="p-0">
+                            <td colSpan={ENGINES.length + 1} style={{ padding: 0 }}>
                               <div
-                                className="mx-5 my-6 rounded-2xl p-8 text-center"
                                 style={{
-                                  background: "var(--sp-accent-bg)",
-                                  border: "1px solid var(--sp-accent-border)",
+                                  margin: "20px",
+                                  borderRadius: 8,
+                                  padding: "40px 32px",
+                                  textAlign: "center",
+                                  background: "#000000",
+                                  boxShadow: "0 0 0 1px #7c3aed, 0 0 30px rgba(124,58,237,0.1)",
                                 }}
                               >
                                 {/* Lock icon */}
                                 <div
-                                  className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4"
                                   style={{
-                                    background: "var(--sp-accent-bg)",
-                                    border: "1px solid var(--sp-accent-border)",
+                                    width: 44,
+                                    height: 44,
+                                    borderRadius: 8,
+                                    border: "1px solid rgba(124,58,237,0.3)",
+                                    background: "rgba(124,58,237,0.08)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    margin: "0 auto 16px",
                                   }}
                                 >
-                                  <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="var(--sp-accent)"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  >
+                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                                   </svg>
                                 </div>
 
                                 <p
-                                  className="text-[11px] font-bold uppercase tracking-widest mb-3"
-                                  style={{ color: "var(--sp-accent)" }}
+                                  style={{
+                                    fontFamily: "var(--font-mono, monospace)",
+                                    fontSize: 11,
+                                    color: "#7c3aed",
+                                    letterSpacing: "0.1em",
+                                    textTransform: "uppercase",
+                                    marginBottom: 12,
+                                  }}
                                 >
-                                  🔒 {hiddenCount} more prompts hidden
+                                  {hiddenCount} more prompts hidden
                                 </p>
                                 <h3
-                                  className="text-xl font-bold mb-2"
                                   style={{
-                                    fontFamily: "var(--font-heading)",
-                                    color: "var(--sp-text)",
+                                    fontFamily: "var(--font-heading, system-ui)",
+                                    fontWeight: 700,
+                                    fontSize: 20,
+                                    color: "#ffffff",
+                                    marginBottom: 8,
                                   }}
                                 >
                                   Your full AI visibility report is ready
                                 </h3>
                                 <p
-                                  className="text-sm mb-6 mx-auto"
-                                  style={{ color: "var(--sp-text-3)", maxWidth: 400 }}
+                                  style={{
+                                    fontSize: 13,
+                                    color: "#888888",
+                                    marginBottom: 28,
+                                    maxWidth: 400,
+                                    margin: "0 auto 28px",
+                                    lineHeight: 1.6,
+                                  }}
                                 >
                                   See all 24 prompts, intent breakdown, and your biggest gaps — free.
                                 </p>
@@ -556,55 +634,83 @@ export function ResultsSection({
                                     setEmailError("");
                                     onEmailSubmit(e);
                                   }}
-                                  className="mx-auto space-y-3"
-                                  style={{ maxWidth: 360 }}
+                                  style={{ maxWidth: 360, margin: "0 auto" }}
                                 >
-                                  <div className="relative">
+                                  <div style={{ position: "relative", marginBottom: 8 }}>
                                     <input
                                       type="email"
                                       required
                                       value={emailInput}
-                                      onChange={(e) => {
-                                        onEmailChange(e.target.value);
-                                        if (emailError) setEmailError("");
-                                      }}
+                                      onChange={(e) => { onEmailChange(e.target.value); if (emailError) setEmailError(""); }}
                                       onFocus={() => onEmailFocus(true)}
                                       onBlur={() => onEmailFocus(false)}
                                       placeholder=" "
-                                      className="w-full rounded-xl px-4 text-sm focus:outline-none transition-colors"
                                       style={{
-                                        background: "var(--sp-card-inner)",
-                                        border: `1px solid ${emailFocused ? "var(--sp-accent)" : "var(--sp-border-card)"}`,
-                                        color: "var(--sp-text)",
-                                        paddingTop: emailInput || emailFocused ? "22px" : "13px",
-                                        paddingBottom: emailInput || emailFocused ? "7px" : "13px",
+                                        width: "100%",
+                                        background: "#0c0c0c",
+                                        border: `1px solid ${emailFocused ? "#7c3aed" : "#1f1f1f"}`,
+                                        borderRadius: 8,
+                                        padding: emailInput || emailFocused ? "22px 16px 8px" : "14px 16px",
+                                        fontSize: 14,
+                                        color: "#ffffff",
+                                        outline: "none",
+                                        fontFamily: "var(--font-body, system-ui)",
+                                        transition: "border-color 150ms ease, padding 150ms ease",
+                                        boxSizing: "border-box",
                                       }}
                                     />
                                     <label
-                                      className="absolute left-4 pointer-events-none transition-all"
                                       style={{
-                                        top: emailInput || emailFocused ? "7px" : "50%",
+                                        position: "absolute",
+                                        left: 16,
+                                        top: emailInput || emailFocused ? 7 : "50%",
                                         transform: emailInput || emailFocused ? "none" : "translateY(-50%)",
                                         fontSize: emailInput || emailFocused ? 10 : 14,
-                                        color: emailFocused ? "var(--sp-accent)" : "var(--sp-text-4)",
+                                        color: emailFocused ? "#7c3aed" : "#444444",
+                                        pointerEvents: "none",
+                                        transition: "all 150ms ease",
+                                        fontFamily: "var(--font-body, system-ui)",
                                       }}
                                     >
                                       Work email
                                     </label>
                                   </div>
                                   {emailError && (
-                                    <p className="text-xs text-red-400 text-left -mt-1">{emailError}</p>
+                                    <p style={{ fontSize: 12, color: "#ef4444", textAlign: "left", marginBottom: 8 }}>
+                                      {emailError}
+                                    </p>
                                   )}
                                   <button
                                     type="submit"
                                     disabled={emailSubmitting}
-                                    className="w-full rounded-xl py-3 text-sm font-bold transition-all hover:opacity-90 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60"
-                                    style={{ background: "var(--sp-accent)", color: "#fff" }}
+                                    style={{
+                                      width: "100%",
+                                      background: "#7c3aed",
+                                      color: "#ffffff",
+                                      border: "none",
+                                      borderRadius: 8,
+                                      padding: "13px",
+                                      fontSize: 14,
+                                      fontWeight: 600,
+                                      fontFamily: "var(--font-heading, system-ui)",
+                                      cursor: emailSubmitting ? "not-allowed" : "pointer",
+                                      transition: "background 150ms ease",
+                                      opacity: emailSubmitting ? 0.6 : 1,
+                                    }}
+                                    onMouseEnter={(e) => { if (!emailSubmitting) e.currentTarget.style.background = "#6d28d9"; }}
+                                    onMouseLeave={(e) => (e.currentTarget.style.background = "#7c3aed")}
                                   >
                                     {emailSubmitting ? "Unlocking..." : "Get My Full Report →"}
                                   </button>
                                 </form>
-                                <p className="mt-3 text-xs" style={{ color: "var(--sp-text-4)" }}>
+                                <p
+                                  style={{
+                                    marginTop: 12,
+                                    fontSize: 11,
+                                    color: "#444444",
+                                    fontFamily: "var(--font-mono, monospace)",
+                                  }}
+                                >
                                   No spam. Unsubscribe anytime.
                                 </p>
                               </div>
@@ -625,51 +731,75 @@ export function ResultsSection({
         {/* Insights */}
         {insights && (
           <div
-            className="mt-8 rounded-2xl border p-6"
             style={{
-              background: "var(--sp-card)",
-              borderColor: "var(--sp-border-card)",
+              marginTop: 24,
+              background: "#0c0c0c",
+              border: "1px solid #1f1f1f",
+              borderRadius: 8,
+              padding: 24,
             }}
           >
             <p
-              className="mb-5 text-[11px] font-semibold uppercase tracking-widest"
-              style={{ color: "var(--sp-text-4)" }}
+              style={{
+                fontFamily: "var(--font-mono, monospace)",
+                fontSize: 10,
+                color: "#444444",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                marginBottom: 20,
+              }}
             >
               Insights
             </p>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-3">
               <div
-                className="rounded-xl p-4"
-                style={{ background: "var(--sp-card-inner)", border: "1px solid rgba(16,185,129,0.2)" }}
+                style={{
+                  background: "#141414",
+                  border: "1px solid rgba(34,197,94,0.2)",
+                  borderRadius: 6,
+                  padding: 16,
+                }}
               >
-                <p className="text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: "var(--sp-text-4)" }}>
+                <p style={{ fontFamily: "var(--font-mono, monospace)", fontSize: 10, color: "#444444", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
                   Strongest intent
                 </p>
-                <p className="font-semibold text-emerald-400">{insights.strongest.label}</p>
-                <p className="text-xs mt-1" style={{ color: "var(--sp-text-3)" }}>
+                <p style={{ fontFamily: "var(--font-heading, system-ui)", fontWeight: 600, color: "#22c55e", marginBottom: 4 }}>
+                  {insights.strongest.label}
+                </p>
+                <p style={{ fontSize: 12, color: "#888888", fontFamily: "var(--font-mono, monospace)" }}>
                   {insights.strongest.p}% visibility
                 </p>
               </div>
               <div
-                className="rounded-xl p-4"
-                style={{ background: "var(--sp-card-inner)", border: "1px solid rgba(239,68,68,0.2)" }}
+                style={{
+                  background: "#141414",
+                  border: "1px solid rgba(239,68,68,0.2)",
+                  borderRadius: 6,
+                  padding: 16,
+                }}
               >
-                <p className="text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: "var(--sp-text-4)" }}>
+                <p style={{ fontFamily: "var(--font-mono, monospace)", fontSize: 10, color: "#444444", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
                   Biggest gap
                 </p>
-                <p className="font-semibold text-red-400">{insights.weakest.label}</p>
-                <p className="text-xs mt-1" style={{ color: "var(--sp-text-3)" }}>
-                  {insights.weakest.p}% visibility — buyers can&apos;t find you
+                <p style={{ fontFamily: "var(--font-heading, system-ui)", fontWeight: 600, color: "#ef4444", marginBottom: 4 }}>
+                  {insights.weakest.label}
+                </p>
+                <p style={{ fontSize: 12, color: "#888888", fontFamily: "var(--font-mono, monospace)" }}>
+                  {insights.weakest.p}% — buyers can&apos;t find you
                 </p>
               </div>
               <div
-                className="rounded-xl p-4"
-                style={{ background: "var(--sp-card-inner)", border: "1px solid var(--sp-border)" }}
+                style={{
+                  background: "#141414",
+                  border: "1px solid #1f1f1f",
+                  borderRadius: 6,
+                  padding: 16,
+                }}
               >
-                <p className="text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: "var(--sp-text-4)" }}>
+                <p style={{ fontFamily: "var(--font-mono, monospace)", fontSize: 10, color: "#444444", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
                   Recommendation
                 </p>
-                <p className="text-xs leading-relaxed" style={{ color: "var(--sp-text-2)" }}>
+                <p style={{ fontSize: 12, color: "#888888", lineHeight: 1.6 }}>
                   {RECOMMENDATIONS[insights.weakest.key]}
                 </p>
               </div>
@@ -679,35 +809,64 @@ export function ResultsSection({
 
         {/* Bottom CTA */}
         <div
-          className="mt-8 rounded-2xl p-5 sm:p-8 text-center"
           style={{
-            background: "var(--sp-accent-bg)",
-            border: "1px solid var(--sp-accent-border)",
+            marginTop: 24,
+            background: "rgba(124,58,237,0.08)",
+            border: "1px solid rgba(124,58,237,0.3)",
+            borderRadius: 8,
+            padding: "40px 32px",
+            textAlign: "center",
           }}
         >
           <h3
-            className="mb-2 text-xl font-bold"
             style={{
-              fontFamily: "var(--font-heading)",
-              color: "var(--sp-text)",
+              fontFamily: "var(--font-heading, system-ui)",
+              fontWeight: 700,
+              fontSize: 20,
+              color: "#ffffff",
+              marginBottom: 8,
             }}
           >
             Want to monitor this daily?
           </h3>
           <p
-            className="mb-6 text-sm mx-auto"
-            style={{ color: "var(--sp-text-3)", maxWidth: 480 }}
+            style={{
+              fontSize: 13,
+              color: "#888888",
+              maxWidth: 480,
+              margin: "0 auto 28px",
+              lineHeight: 1.65,
+            }}
           >
             Get weekly AI visibility reports, track competitors, and know when your brand disappears
             from AI search — before it costs you pipeline.
           </p>
           <button
-            className="rounded-full px-8 py-3.5 font-bold text-sm transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
-            style={{ background: "var(--sp-accent)", color: "#fff" }}
+            style={{
+              background: "#7c3aed",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: 8,
+              padding: "13px 32px",
+              fontSize: 14,
+              fontWeight: 600,
+              fontFamily: "var(--font-heading, system-ui)",
+              cursor: "pointer",
+              transition: "background 150ms ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#6d28d9")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#7c3aed")}
           >
             Get Weekly Reports — $49/mo
           </button>
-          <p className="mt-3 text-xs" style={{ color: "var(--sp-text-4)" }}>
+          <p
+            style={{
+              marginTop: 12,
+              fontSize: 11,
+              color: "#444444",
+              fontFamily: "var(--font-mono, monospace)",
+            }}
+          >
             Cancel anytime. 7-day free trial included.
           </p>
         </div>
