@@ -16,22 +16,17 @@ function normalizeDomain(input: string): string {
 }
 
 function detectBrand(responseText: string, brandVariations: string[]): boolean {
-  // Normalize response: lowercase, collapse punctuation to spaces
-  const cleaned = responseText
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ");
+  // Normalize response: strip everything except letters and numbers
+  const normalizedResponse = responseText.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-  const found = brandVariations.find((v) => {
-    const variation = v.toLowerCase().replace(/[^a-z0-9\s]/g, " ").trim();
-    return variation.length >= 3 && cleaned.includes(variation);
+  const found = brandVariations.find((variation) => {
+    if (!variation || variation.length < 3) return false;
+    const normalizedVariation = variation.toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (normalizedVariation.length < 3) return false;
+    return normalizedResponse.includes(normalizedVariation);
   });
 
-  if (found) {
-    console.log("[DETECT] FOUND variation:", found);
-  } else {
-    console.log("[DETECT] NOT FOUND. Checked:", brandVariations.slice(0, 15));
-  }
+  console.log("[DETECT]", found ? `FOUND: ${found}` : `NOT FOUND. Checked: ${brandVariations.join(", ")}`);
 
   return !!found;
 }
@@ -54,14 +49,23 @@ interface FlatPrompt {
 type EngineResult = { appeared: boolean; snippet: string };
 
 function extractSnippet(text: string, brandVariations: string[]): string {
-  const cleaned = text.toLowerCase().replace(/[^a-z0-9\s]/g, " ");
+  // Find match position by mapping stripped index back to original text
+  const rawLower = text.toLowerCase();
+  const stripped = rawLower.replace(/[^a-z0-9]/g, "");
 
   let matchIndex = -1;
   for (const v of brandVariations) {
-    const variation = v.toLowerCase().replace(/[^a-z0-9\s]/g, " ").trim();
-    if (variation.length < 3) continue;
-    const idx = cleaned.indexOf(variation);
-    if (idx !== -1) { matchIndex = idx; break; }
+    const normalizedVariation = v.toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (normalizedVariation.length < 3) continue;
+    const strippedIdx = stripped.indexOf(normalizedVariation);
+    if (strippedIdx === -1) continue;
+    // Map stripped index back to original text position
+    let count = 0;
+    for (let i = 0; i < rawLower.length; i++) {
+      if (/[a-z0-9]/.test(rawLower[i])) count++;
+      if (count > strippedIdx) { matchIndex = i; break; }
+    }
+    break;
   }
 
   if (matchIndex === -1) return text.slice(0, 200) + (text.length > 200 ? "..." : "");

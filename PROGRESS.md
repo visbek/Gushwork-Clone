@@ -33,7 +33,7 @@
   - ICP Summary card above engine scores (company, what they do, buyer, pain)
   - Results table split into 4 intent sections with appearance counts + % per section
   - Insights panel: strongest intent, biggest gap, actionable recommendation
-- [x] Brand detection working with smart text matching (single API call + detectBrand())
+- [x] Brand detection: permanent fix — normalize BOTH response and variation to alphanumeric only before comparing. Works for any brand forever (AnswerThePublic, CleverTap, MoEngage, boAt, eco365, etc.)
 - [x] Company name cleaning: strips "by Person Name" and "- tagline" patterns
 - [x] Brand-specific prompts: discovery/transactional include 2-3 branded/navigational queries
 - [x] Domain normalization: strips https://, www., trailing slash (consistent cache keys)

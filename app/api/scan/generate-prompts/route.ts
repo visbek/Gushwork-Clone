@@ -68,72 +68,53 @@ function stripCodeFences(text: string): string {
 // ─── Brand variation extraction ──────────────────────────────────────────────
 
 function extractBrandVariations(html: string, domain: string): string[] {
-  const sources = new Set<string>();
-
-  // 1. og:site_name (most reliable — set explicitly by site owners)
-  const ogSite =
-    html.match(/<meta[^>]*property="og:site_name"[^>]*content="([^"]+)"/i) ??
-    html.match(/<meta[^>]*content="([^"]+)"[^>]*property="og:site_name"/i);
-  if (ogSite) sources.add(ogSite[1]);
-
-  // 2. og:title — take only the part before any separator
-  const ogTitle =
-    html.match(/<meta[^>]*property="og:title"[^>]*content="([^"]+)"/i) ??
-    html.match(/<meta[^>]*content="([^"]+)"[^>]*property="og:title"/i);
-  if (ogTitle) sources.add(ogTitle[1].split(/[|\-–:]/)[0].trim());
-
-  // 3. <title> tag — same trimming
-  const titleTag = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-  if (titleTag) sources.add(titleTag[1].split(/[|\-–:]/)[0].trim());
-
-  // 4. application-name meta
-  const appName =
-    html.match(/<meta[^>]*name="application-name"[^>]*content="([^"]+)"/i) ??
-    html.match(/<meta[^>]*content="([^"]+)"[^>]*name="application-name"/i);
-  if (appName) sources.add(appName[1]);
-
-  // 5. twitter:site handle (strip leading @)
-  const twitter =
-    html.match(/<meta[^>]*name="twitter:site"[^>]*content="@?([^"]+)"/i) ??
-    html.match(/<meta[^>]*content="@?([^"]+)"[^>]*name="twitter:site"/i);
-  if (twitter) sources.add(twitter[1].replace("@", ""));
-
-  // 6. Domain root — always included as final fallback
   const domainRoot = domain
     .replace(/^(https?:\/\/)?(www\.)?/, "")
     .split(".")[0];
-  sources.add(domainRoot);
 
-  // Expand each source into all its variations
-  const allVariations = new Set<string>();
+  // Extract signals from HTML
+  const signals: string[] = [
+    html.match(/<meta[^>]*property="og:site_name"[^>]*content="([^"]+)"/i)?.[1],
+    html.match(/<meta[^>]*content="([^"]+)"[^>]*property="og:site_name"/i)?.[1],
+    html.match(/<meta[^>]*property="og:title"[^>]*content="([^"]+)"/i)?.[1]
+      ?.split(/[|\-–:]/)[0].trim(),
+    html.match(/<meta[^>]*content="([^"]+)"[^>]*property="og:title"/i)?.[1]
+      ?.split(/[|\-–:]/)[0].trim(),
+    html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]
+      ?.split(/[|\-–:]/)[0].trim(),
+    html.match(/<meta[^>]*name="application-name"[^>]*content="([^"]+)"/i)?.[1],
+    html.match(/<h1[^>]*>([^<]+)<\/h1>/i)?.[1]?.trim(),
+    domainRoot,
+  ].filter((s): s is string => !!s && s.length >= 2);
 
-  sources.forEach((v) => {
-    const clean = v.trim();
-    if (!clean || clean.length < 2) return;
+  const raw = new Set<string>();
 
-    // Full lowercased name: "clevertap", "boat lifestyle"
-    allVariations.add(clean.toLowerCase());
-
-    // Split camelCase: "CleverTap" → ["clever", "tap"]
-    clean
+  signals.forEach((signal) => {
+    // As-is
+    raw.add(signal);
+    // Without spaces
+    raw.add(signal.replace(/\s+/g, ""));
+    // Hyphens as spaces
+    raw.add(signal.replace(/-/g, " "));
+    // Domain-style (no spaces, no hyphens)
+    raw.add(signal.replace(/[\s-]/g, ""));
+    // Split camelCase — add individual words >= 4 chars and their joined form
+    const camelWords = signal
       .replace(/([A-Z])/g, " $1")
       .trim()
       .toLowerCase()
       .split(/\s+/)
-      .filter((w) => w.length >= 3)
-      .forEach((w) => allVariations.add(w));
-
-    // Remove spaces: "Clever Tap" → "clevertap"
-    allVariations.add(clean.toLowerCase().replace(/\s+/g, ""));
-
-    // Replace spaces with hyphen: "clever-tap"
-    allVariations.add(clean.toLowerCase().replace(/\s+/g, "-"));
-
-    // Strip all non-alphanumeric: "bo@t" → "bot"
-    allVariations.add(clean.toLowerCase().replace(/[^a-z0-9]/g, ""));
+      .filter((w) => w.length >= 4);
+    camelWords.forEach((w) => raw.add(w));
+    if (camelWords.length > 1) raw.add(camelWords.join(""));
   });
 
-  return [...allVariations].filter((v) => v.length >= 3);
+  // Always ensure domain root variations are present
+  raw.add(domainRoot);
+  raw.add(domainRoot.replace(/-/g, ""));
+  raw.add(domainRoot.replace(/-/g, " "));
+
+  return [...raw].filter((v) => v && v.length >= 3);
 }
 
 interface WebsiteData {
