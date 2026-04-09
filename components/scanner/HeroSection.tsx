@@ -45,12 +45,12 @@ export function HeroSection({ domain, status, onDomainChange, onScan }: HeroSect
               AI Search Intelligence
             </p>
 
-            {/* Headline — Instrument Serif */}
+            {/* Headline — Barlow */}
             <h1
               className="animate-fade-in-up"
               style={{
-                fontFamily: "var(--font-serif, Georgia, serif)",
-                fontWeight: 400,
+                fontFamily: "var(--font-heading, sans-serif)",
+                fontWeight: 800,
                 fontSize: "clamp(40px, 6vw, 68px)",
                 lineHeight: 1.05,
                 letterSpacing: "-0.01em",

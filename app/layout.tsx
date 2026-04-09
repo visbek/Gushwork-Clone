@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, DM_Sans, DM_Mono } from "next/font/google";
+import { Barlow, DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
 
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-serif",
+const barlow = Barlow({
+  variable: "--font-heading",
   subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
+  weight: ["600", "700", "800"],
 });
 
 const dmSans = DM_Sans({
@@ -35,7 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${instrumentSerif.variable} ${dmSans.variable} ${dmMono.variable} h-full antialiased`}
+      className={`${barlow.variable} ${dmSans.variable} ${dmMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
