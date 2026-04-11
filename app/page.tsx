@@ -9,8 +9,11 @@ import {
   type ScanStatus,
   type EngineState,
 } from "@/components/scanner/types";
+import { supabase } from "@/lib/supabase";
+import type { User } from "@supabase/supabase-js";
 
 export default function Home() {
+  const [user, setUser] = useState<User | null>(null);
   const [domain, setDomain] = useState("");
   const [status, setStatus] = useState<ScanStatus>("idle");
   const [rateLimited, setRateLimited] = useState(false);
@@ -33,6 +36,16 @@ export default function Home() {
   const [scanTextIdx, setScanTextIdx] = useState(0);
 
   const resultsRef = useRef<HTMLDivElement | null>(null);
+
+  // ── Auth state ───────────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   // ── localStorage ────────────────────────────────────────────────────────────
 
@@ -126,6 +139,23 @@ export default function Home() {
       const data = await r2.json();
       setScanData({ ...data, businessProfile: icpData.businessProfile, icp: icpData.icp });
       setStatus("done");
+
+      // Auto-save scan to Supabase if user is logged in
+      if (user) {
+        supabase.from("scans").insert({
+          user_id: user.id,
+          domain: trimmed,
+          score: data.overallScore ?? null,
+          gemini_score: data.engineScores?.gemini ?? null,
+          claude_score: data.engineScores?.claude ?? null,
+          chatgpt_score: data.engineScores?.chatgpt ?? null,
+          perplexity_score: data.engineScores?.perplexity ?? null,
+          icp_data: icpData.icp ?? null,
+          results: data.results ?? null,
+        }).then(({ error }) => {
+          if (error) console.error("[scan] Supabase save error:", error);
+        });
+      }
     } catch {
       setStatus("error");
     }
@@ -188,26 +218,52 @@ export default function Home() {
             sparrwo
           </span>
 
-          {/* Try Free */}
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            style={{
-              background: "#0a0a0a",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: 6,
-              padding: "8px 16px",
-              fontSize: 13,
-              fontWeight: 600,
-              fontFamily: "var(--font-sans, system-ui)",
-              cursor: "pointer",
-              transition: "background 150ms ease",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#f97316")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "#0a0a0a")}
-          >
-            Try Free
-          </button>
+          {/* Nav CTA */}
+          {user ? (
+            <a
+              href="/dashboard"
+              style={{
+                background: "#0a0a0a",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: 6,
+                padding: "8px 16px",
+                fontSize: 13,
+                fontWeight: 600,
+                fontFamily: "var(--font-sans, system-ui)",
+                cursor: "pointer",
+                transition: "background 150ms ease",
+                textDecoration: "none",
+                display: "inline-block",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#f97316")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#0a0a0a")}
+            >
+              Dashboard
+            </a>
+          ) : (
+            <a
+              href="/login"
+              style={{
+                background: "#0a0a0a",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: 6,
+                padding: "8px 16px",
+                fontSize: 13,
+                fontWeight: 600,
+                fontFamily: "var(--font-sans, system-ui)",
+                cursor: "pointer",
+                transition: "background 150ms ease",
+                textDecoration: "none",
+                display: "inline-block",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#f97316")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#0a0a0a")}
+            >
+              Sign In
+            </a>
+          )}
         </div>
       </nav>
 
