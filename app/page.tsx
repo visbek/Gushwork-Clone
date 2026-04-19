@@ -11,6 +11,7 @@ import {
 } from "@/components/scanner/types";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
+import type { KeywordsData } from "@/components/scanner/ResultsSection";
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
@@ -18,6 +19,10 @@ export default function Home() {
   const [status, setStatus] = useState<ScanStatus>("idle");
   const [rateLimited, setRateLimited] = useState(false);
   const [scanData, setScanData] = useState<ScanData | null>(null);
+
+  // Keywords state
+  const [keywordsData, setKeywordsData] = useState<KeywordsData | null>(null);
+  const [keywordsLoading, setKeywordsLoading] = useState(false);
 
   // Email wall state
   const [emailCaptured, setEmailCaptured] = useState(false);
@@ -105,6 +110,8 @@ export default function Home() {
     const trimmed = inputDomain.trim().replace(/^https?:\/\//, "").replace(/\/$/, "");
     if (!trimmed) return;
     setScanData(null);
+    setKeywordsData(null);
+    setKeywordsLoading(false);
     setRateLimited(false);
     setStatus("generating");
     setScanTextIdx(0);
@@ -139,6 +146,25 @@ export default function Home() {
       const data = await r2.json();
       setScanData({ ...data, businessProfile: icpData.businessProfile, icp: icpData.icp });
       setStatus("done");
+
+      // Kick off keyword recommendations in background
+      setKeywordsData(null);
+      setKeywordsLoading(true);
+      fetch("/api/scan/keywords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          domain: trimmed,
+          industry: icpData.businessProfile?.industry ?? "",
+          companyName: icpData.businessProfile?.companyName ?? "",
+          whatTheySell: icpData.businessProfile?.whatTheySell ?? "",
+          buyerLocation: icpData.icp?.buyerLocation ?? "",
+        }),
+      })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((kw) => { if (kw) setKeywordsData(kw); })
+        .catch((e) => { console.error("[keywords]", e); })
+        .finally(() => setKeywordsLoading(false));
 
       // Auto-save scan to Supabase if user is logged in
       if (user) {
@@ -336,6 +362,8 @@ export default function Home() {
       {status === "done" && scanData && (
         <ResultsSection
           scanData={scanData}
+          keywordsData={keywordsData}
+          keywordsLoading={keywordsLoading}
           emailCaptured={emailCaptured}
           emailInput={emailInput}
           emailFocused={emailFocused}

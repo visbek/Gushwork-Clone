@@ -200,10 +200,301 @@ function EngineCard({
   );
 }
 
+// ── Keyword types ─────────────────────────────────────────────────────────────
+
+export interface KeywordItem {
+  keyword: string;
+  searchVolume: "High" | "Medium" | "Low";
+  llmPotential: "High" | "Medium" | "Low";
+  why: string;
+}
+
+export interface KeywordsData {
+  tier1: KeywordItem[];
+  tier2: KeywordItem[];
+  tier3: KeywordItem[];
+}
+
+// ── KeywordCard ───────────────────────────────────────────────────────────────
+
+function KeywordCard({ item, borderColor }: { item: KeywordItem; borderColor: string }) {
+  const [copied, setCopied] = useState(false);
+  const [hovered, setHovered] = useState(false);
+
+  function handleCopy() {
+    navigator.clipboard.writeText(item.keyword).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  }
+
+  const potentialColor =
+    item.llmPotential === "High"
+      ? { bg: "#f0fdf4", border: "#bbf7d0", text: "#16a34a" }
+      : item.llmPotential === "Medium"
+      ? { bg: "#fffbeb", border: "#fde68a", text: "#d97706" }
+      : { bg: "#f7f7f5", border: "#e5e5e0", text: "#999990" };
+
+  const volColor =
+    item.searchVolume === "High"
+      ? { bg: "#eff6ff", border: "#bfdbfe", text: "#2563eb" }
+      : item.searchVolume === "Medium"
+      ? { bg: "#faf5ff", border: "#e9d5ff", text: "#7c3aed" }
+      : { bg: "#f7f7f5", border: "#e5e5e0", text: "#999990" };
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background: "#ffffff",
+        border: "1px solid #e5e5e0",
+        borderLeft: `3px solid ${borderColor}`,
+        borderRadius: 6,
+        padding: "14px 16px",
+        transition: "border-color 150ms ease",
+        position: "relative",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+        <p
+          style={{
+            fontFamily: "var(--font-sans, system-ui)",
+            fontWeight: 600,
+            fontSize: 14,
+            color: "#0a0a0a",
+            lineHeight: 1.4,
+            flex: 1,
+          }}
+        >
+          {item.keyword}
+        </p>
+        {hovered && (
+          <button
+            onClick={handleCopy}
+            style={{
+              background: copied ? "#f0fdf4" : "#f7f7f5",
+              border: `1px solid ${copied ? "#bbf7d0" : "#e5e5e0"}`,
+              borderRadius: 4,
+              padding: "3px 10px",
+              fontSize: 11,
+              fontFamily: "var(--font-mono, monospace)",
+              color: copied ? "#16a34a" : "#555550",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          >
+            {copied ? "Copied!" : "Copy"}
+          </button>
+        )}
+      </div>
+
+      <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+        <span
+          style={{
+            fontSize: 10,
+            fontFamily: "var(--font-mono, monospace)",
+            letterSpacing: "0.06em",
+            padding: "2px 7px",
+            borderRadius: 3,
+            background: potentialColor.bg,
+            border: `1px solid ${potentialColor.border}`,
+            color: potentialColor.text,
+          }}
+        >
+          LLM: {item.llmPotential}
+        </span>
+        <span
+          style={{
+            fontSize: 10,
+            fontFamily: "var(--font-mono, monospace)",
+            letterSpacing: "0.06em",
+            padding: "2px 7px",
+            borderRadius: 3,
+            background: volColor.bg,
+            border: `1px solid ${volColor.border}`,
+            color: volColor.text,
+          }}
+        >
+          Vol: {item.searchVolume}
+        </span>
+      </div>
+
+      <p
+        style={{
+          marginTop: 8,
+          fontFamily: "var(--font-sans, system-ui)",
+          fontSize: 12,
+          color: "#999990",
+          lineHeight: 1.55,
+        }}
+      >
+        {item.why}
+      </p>
+    </div>
+  );
+}
+
+// ── KeywordsSection ───────────────────────────────────────────────────────────
+
+function KeywordsSection({ keywordsData, keywordsLoading }: { keywordsData: KeywordsData | null; keywordsLoading: boolean }) {
+  const [activeTab, setActiveTab] = useState<"tier1" | "tier2" | "tier3">("tier1");
+
+  const tabs = [
+    { key: "tier1" as const, label: "High Intent", borderColor: "#f97316" },
+    { key: "tier2" as const, label: "Mid Intent", borderColor: "#d97706" },
+    { key: "tier3" as const, label: "Awareness", borderColor: "#d0d0c8" },
+  ];
+
+  const activeItems = keywordsData?.[activeTab] ?? [];
+  const activeBorder = tabs.find((t) => t.key === activeTab)!.borderColor;
+
+  return (
+    <div style={{ marginTop: 48 }}>
+      {/* Section header */}
+      <div style={{ marginBottom: 20 }}>
+        <p
+          style={{
+            fontFamily: "var(--font-mono, monospace)",
+            fontSize: 10,
+            color: "#999990",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            marginBottom: 6,
+          }}
+        >
+          Keywords
+        </p>
+        <h2
+          style={{
+            fontFamily: "var(--font-sans, system-ui)",
+            fontWeight: 700,
+            fontSize: 20,
+            color: "#0a0a0a",
+            letterSpacing: "-0.02em",
+            marginBottom: 4,
+          }}
+        >
+          Keywords to Target
+        </h2>
+        <p style={{ fontFamily: "var(--font-sans, system-ui)", fontSize: 13, color: "#555550" }}>
+          Based on real buyer searches — ranked by revenue potential
+        </p>
+      </div>
+
+      {/* Loading state */}
+      {keywordsLoading && (
+        <div
+          style={{
+            background: "#f7f7f5",
+            border: "1px solid #e5e5e0",
+            borderRadius: 8,
+            padding: "40px 24px",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+            <span
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: "50%",
+                border: "2px solid #e5e5e0",
+                borderTopColor: "#f97316",
+                display: "inline-block",
+                animation: "sp-ring-spin 0.8s linear infinite",
+              }}
+            />
+            <span style={{ fontFamily: "var(--font-mono, monospace)", fontSize: 13, color: "#999990" }}>
+              Generating keyword recommendations...
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Tabs + content */}
+      {!keywordsLoading && keywordsData && (
+        <>
+          {/* Tab bar */}
+          <div
+            style={{
+              display: "flex",
+              gap: 4,
+              marginBottom: 16,
+              borderBottom: "1px solid #e5e5e0",
+            }}
+          >
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: "10px 16px",
+                  fontSize: 13,
+                  fontWeight: activeTab === tab.key ? 600 : 400,
+                  fontFamily: "var(--font-sans, system-ui)",
+                  color: activeTab === tab.key ? "#0a0a0a" : "#999990",
+                  cursor: "pointer",
+                  borderBottom: activeTab === tab.key ? `2px solid ${tab.borderColor}` : "2px solid transparent",
+                  marginBottom: -1,
+                  transition: "color 150ms ease",
+                }}
+              >
+                {tab.label}
+                <span
+                  style={{
+                    marginLeft: 6,
+                    fontFamily: "var(--font-mono, monospace)",
+                    fontSize: 11,
+                    color: activeTab === tab.key ? tab.borderColor : "#d0d0c8",
+                  }}
+                >
+                  {keywordsData[tab.key]?.length ?? 0}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Keyword cards */}
+          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr" }}>
+            {activeItems.map((item, i) => (
+              <KeywordCard key={i} item={item} borderColor={activeBorder} />
+            ))}
+          </div>
+
+          {/* Footer note */}
+          <p
+            style={{
+              marginTop: 20,
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: 11,
+              color: "#999990",
+              lineHeight: 1.7,
+              textAlign: "center",
+              padding: "16px 24px",
+              background: "#f7f7f5",
+              border: "1px solid #e5e5e0",
+              borderRadius: 6,
+            }}
+          >
+            Appearing for these keywords in ChatGPT, Gemini &amp; Perplexity drives inbound pipeline.{" "}
+            <span style={{ color: "#f97316" }}>sparrwo</span> tracks your visibility for each.
+          </p>
+        </>
+      )}
+    </div>
+  );
+}
+
 // ── ResultsSection ────────────────────────────────────────────────────────────
 
 interface ResultsSectionProps {
   scanData: ScanData;
+  keywordsData: KeywordsData | null;
+  keywordsLoading: boolean;
   emailCaptured: boolean;
   emailInput: string;
   emailFocused: boolean;
@@ -217,6 +508,8 @@ interface ResultsSectionProps {
 
 export function ResultsSection({
   scanData,
+  keywordsData,
+  keywordsLoading,
   emailCaptured,
   emailInput,
   emailFocused,
@@ -974,6 +1267,9 @@ export function ResultsSection({
             </div>
           </div>
         )}
+
+        {/* Keywords section */}
+        <KeywordsSection keywordsData={keywordsData} keywordsLoading={keywordsLoading} />
 
         {/* Bottom CTA */}
         <div
