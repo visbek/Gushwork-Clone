@@ -1,31 +1,44 @@
 # Contributing to sparrwo
 
-Local → feature branch → Vercel preview → review → merge → production. Every step is automated by Vercel + GitHub.
+Local → feature branch → **staging** → production. Every change goes through the staging environment before it reaches `sparrwo.com`.
+
+Detailed staging setup is in [docs/STAGING.md](./docs/STAGING.md). This file is the day-to-day reference.
 
 ## TL;DR
 
 ```bash
-git checkout -b feat/your-change      # branch off main
+git checkout -b feat/your-change      # branch off staging
 npm run dev                            # localhost:3000
 # ...code, test, run lint...
 git push -u origin feat/your-change    # Vercel auto-builds a preview
-gh pr create --base main               # open PR; Vercel comments the preview URL
-# ...review, address comments...
-gh pr merge --squash                   # merging to main triggers production deploy
+gh pr create --base staging --fill     # open PR into staging (NOT main)
+# ...review the Vercel preview URL, address comments...
+gh pr merge --squash                   # merging to staging → deploys to staging.sparrwo
+
+# When staging looks good, cut a release PR to main:
+gh pr create --base main --head staging --title "Release: $(date +%Y-%m-%d)"
+gh pr merge --squash                   # merging to main → deploys to sparrwo.com
 ```
 
 ## The promotion path
 
 ```
-┌─────────────┐    push     ┌──────────────────────┐   merge to    ┌────────────────────┐
-│   local     │ ─────────▶  │  feature branch +    │ ─── main ───▶ │  production deploy │
-│  (next dev) │             │  Vercel preview URL  │               │  (sparrwo.com)     │
-└─────────────┘             └──────────────────────┘               └────────────────────┘
-                                       │
-                                       └─ comment on PR with preview link
+┌─────────────┐  PR into  ┌──────────────────────┐  PR into  ┌────────────────────┐
+│   local     │  staging  │  staging branch      │   main    │  main → sparrwo.com│
+│  (next dev) │ ────────▶ │  → staging.sparrwo   │ ────────▶ │   (production)     │
+└─────────────┘           └──────────────────────┘           └────────────────────┘
+       │                            ▲                                  │
+       │ feature branch             │   sync staging from main         │
+       │ → Vercel preview URL ──────┘   after any hotfix               │
+       │                                                               │
+       └─── hotfix → main directly (skip staging) ─────────────────────┘
 ```
 
-Vercel watches every branch and creates a preview deployment automatically. The preview URL is posted as a comment on the PR. The production deployment is **only** triggered when you merge into `main`.
+Vercel watches every branch and creates a preview deployment automatically. The preview URL is posted as a comment on the PR. Two long-lived branches each trigger their own auto-deploy:
+- Push to **`staging`** → `staging.sparrwo` URL
+- Push to **`main`** → `sparrwo.com`
+
+**The default flow is staging-first.** Only use `--base main` for hotfixes; see the Hotfixes section below.
 
 ## Branch naming
 
@@ -61,9 +74,9 @@ Examples: `feat/sentiment-donut`, `fix/scan-rate-limit`, `refactor/extract-engin
 ## Daily flow
 
 ```bash
-# Start your day
-git checkout main
-git pull --rebase origin main
+# Start your day — branch off staging, not main
+git checkout staging
+git pull --rebase origin staging
 git checkout -b feat/my-thing
 
 # While coding
@@ -92,10 +105,24 @@ Vercel will start a preview deploy. Within ~60s the bot will comment on the PR w
 - `Preview: https://sparrwo-git-feat-my-thing-<team>.vercel.app/`
 - Build logs and status
 
-Open the PR (CLI or web). Use the template — explain *why*, link the issue, list manual test steps.
+Open the PR (CLI or web). **Base = `staging`**, not main. Use the template — explain *why*, link the issue, list manual test steps.
 
 ```bash
-gh pr create --base main --fill
+gh pr create --base staging --fill
+```
+
+### Hotfixes (skip staging)
+
+When production has a bug that can't wait for the next staging cycle:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b hotfix/critical-thing
+# fix + commit
+gh pr create --base main --fill --label hotfix
+# after merge, sync staging from main so it doesn't drift
+git checkout staging && git pull && git merge main && git push origin staging
 ```
 
 ## Reviewing
